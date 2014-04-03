@@ -1,6 +1,6 @@
 <?php
 
-namespace LineStorm\MediaBundle\Controller\Admin;
+namespace LineStorm\MediaBundle\Controller;
 
 use FOS\RestBundle\View\View;
 use LineStorm\MediaBundle\Media\Exception\MediaFileAlreadyExistsException;
@@ -24,7 +24,7 @@ class AdminController extends Controller
 
         $providers = $mediaManager->getMediaProviders();
 
-        return $this->render('LineStormBlogBundle:Media:list.html.twig', array(
+        return $this->render('LineStormMediaBundle:Admin:list.html.twig', array(
             'providers' => $providers,
         ));
 
@@ -43,11 +43,11 @@ class AdminController extends Controller
         $media = $mediaManager->find($id);
 
         $form = $this->createForm('linestorm_blog_form_media', $media, array(
-            'action' => $this->generateUrl('linestorm_blog_admin_module_media_api_post_media', array('id' => $media->getId())),
+            'action' => $this->generateUrl('linestorm_blog_media_module_api_put_media', array('id' => $media->getId())),
             'method' => 'PUT',
         ));
 
-        return $this->render('LineStormBlogBundle:Admin:edit.html.twig', array(
+        return $this->render('LineStormMediaBundle:Admin:edit.html.twig', array(
             'image'      => $media,
             'form'      => $form->createView(),
         ));
@@ -62,11 +62,11 @@ class AdminController extends Controller
         }
 
         $form = $this->createForm('linestorm_blog_form_media', null, array(
-            'action' => $this->generateUrl('linestorm_blog_admin_module_media_api_post_media'),
+            'action' => $this->generateUrl('linestorm_blog_media_module_api_post_media'),
             'method' => 'POST',
         ));
 
-        return $this->render('LineStormBlogBundle:Admin:new.html.twig', array(
+        return $this->render('LineStormMediaBundle:Admin:new.html.twig', array(
             'image' => null,
             'form'  => $form->createView(),
         ));
@@ -100,7 +100,7 @@ class AdminController extends Controller
             throw new HttpException(400, 'Upload Invalid', $e);
         }
 
-        $view = View::create(new \LineStorm\BlogBundle\Document\Media($media), $code);
+        $view = View::create(new \LineStorm\MediaBundle\Document\Media($media), $code);
         $view->setFormat('json');
         return $this->get('fos_rest.view_handler')->handle($view);
     }
@@ -138,7 +138,7 @@ class AdminController extends Controller
             throw new HttpException(400, 'Upload Invalid', $e);
         }
 
-        $view = View::create(new \LineStorm\BlogBundle\Document\Media($image), $code);
+        $view = View::create(new \LineStorm\MediaBundle\Document\Media($image), $code);
         $view->setFormat('json');
         return $this->get('fos_rest.view_handler')->handle($view);
     }

@@ -94,7 +94,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
             $updatedMedia = $form->getData();
             $mediaManager->update($updatedMedia);
 
-            $view = $this->createResponse(array('location' => $this->generateUrl('linestorm_blog_admin_module_media_api_get_media', array( 'id' => $form->getData()->getId()))), 200);
+            $view = $this->createResponse(array('location' => $this->generateUrl('linestorm_blog_media_module_api_get_media', array( 'id' => $form->getData()->getId()))), 200);
         }
         else
         {
@@ -131,7 +131,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
             $updatedMedia = $form->getData();
             $mediaManager->update($updatedMedia);
 
-            $view = $this->createResponse(array('location' => $this->generateUrl('linestorm_blog_admin_module_media_api_get_media', array( 'id' => $form->getData()->getId()))), 200);
+            $view = $this->createResponse(array('location' => $this->generateUrl('linestorm_blog_media_module_api_get_media', array( 'id' => $form->getData()->getId()))), 200);
         }
         else
         {

@@ -18,7 +18,7 @@ class LineStormMediaBundle extends Bundle
 
         $modelDir = realpath(__DIR__.'/Resources/config/model/doctrine');
         $mappings = array(
-            $modelDir => 'LineStorm\BlogBundle\Model',
+            $modelDir => 'LineStorm\MediaBundle\Model',
         );
 
         $ormCompilerClass = 'Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass';

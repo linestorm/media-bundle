@@ -1,6 +1,6 @@
 <?php
 
-namespace LineStorm\MediaBundle\Module\Media;
+namespace LineStorm\MediaBundle\Module;
 
 use LineStorm\MediaBundle\Media\MediaManager;
 use LineStorm\BlogBundle\Module\AbstractModule;
@@ -54,6 +54,6 @@ class MediaModule extends AbstractModule implements ModuleInterface
      */
     public function addRoutes(LoaderInterface $loader)
     {
-        return $loader->import('@LineStormBlogBundle/Resources/config/routing/modules/media/media.yml', 'yaml');
+        return $loader->import('@LineStormMediaBundle/Resources/config/routing.yml', 'yaml');
     }
 } 
