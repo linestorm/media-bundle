@@ -1,0 +1,110 @@
+{% extends 'LineStormBlogBundle:Admin:index.html.twig' %}
+
+{% block page_title %}View All Media{% endblock %}
+
+{% import _self as fn %}
+{% macro imageItem () %}
+    {% spaceless %}
+    <a href="__id__/edit" class="media-preview-item">
+        <img src="__src__" />
+        <div class="details">
+            __title__
+        </div>
+    </a>
+    {% endspaceless %}
+{% endmacro %}
+
+{% block content %}
+    <script type="text/javascript">
+        var page = 1,
+            $container;
+
+        function requestPage(){
+            $.ajax({
+                url: "{{ path('linestorm_blog_admin_module_media_api_get_media_all') }}",
+                data: {
+                    page: page,
+                    limit: 50
+                },
+                type: 'GET',
+                dataType: 'json',
+                success: function(o){
+                    $container.empty();
+                    var html = '';
+                    for(var i in o){
+                        var media = o[i];
+                        var prototype = $container.data('prototype');
+                        for(var p in media){
+                            var prop = media[p];
+                            var rgx = new RegExp("__"+p+"__", "gim");
+                            prototype = prototype.replace(rgx, prop);
+                        }
+                        html += prototype;
+                    }
+
+                    $container.append(html);
+                }
+            });
+        };
+        $(document).ready(function(){
+            $container = $('.media-container');
+
+            $('a.media-prev').on('click', function(){
+                if(page <= 0)
+                    return;
+                --page;
+                requestPage();
+            });
+            $('a.media-next').on('click', function(){
+                ++page;
+                requestPage();
+            });
+            requestPage();
+        });
+    </script>
+    <style type="text/css">
+        .media-preview-item {
+            float: left;
+            height: 100px;
+            width: 100px;
+            margin: 20px;
+            overflow: hidden;
+            border: 1px solid #aaaaaa;
+            padding: 2px;
+            position: relative;
+        }
+        .media-preview-item:hover {
+            border: 1px solid #666666;
+        }
+        .media-preview-item > img {
+
+            max-height: 100%;
+            max-width: 100%;
+        }
+        .media-preview-item > .details {
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+            background-color: rgba(50, 50, 50, 0.7);
+            color: #e0e0e0;
+            font-size: 9px;
+            line-height: 9px;
+            padding: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    </style>
+    <ul class="pager pull-left">
+        <li><a class="media-prev" href="#">Previous</a></li>
+        <li><a class="media-next" href="#">Next</a></li>
+    </ul>
+    <div class="row">
+        <div class="col-sm-12 media-container" data-prototype="{{ fn.imageItem()|e('html_attr') }}">
+
+        </div>
+    </div>
+    <ul class="pager pull-left">
+        <li><a class="media-prev" href="#">Previous</a></li>
+        <li><a class="media-next" href="#">Next</a></li>
+    </ul>
+{% endblock %}

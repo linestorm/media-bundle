@@ -1,0 +1,4 @@
+linestorm_blog_media_module_api_controller:
+    type:     rest
+    resource: LineStorm\MediaBundle\Controller\Api\MediaController
+    name_prefix:  linestorm_blog_media_module_api_

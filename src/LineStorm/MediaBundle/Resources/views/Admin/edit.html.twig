@@ -1,0 +1,316 @@
+{% extends 'LineStormBlogBundle:Admin:layout.html.twig' %}
+{% block page_title %}Edit Media{% endblock %}
+{% block page_desc %}{% endblock %}
+
+{% import _self as fn %}
+{% macro dzPreview(child) %}
+    {% spaceless %}
+        <div class="dz-preview">
+            <div class="panel-left">
+                <img class="dz-image" data-dz-thumbnail {% if child %}src="{{ child.image.offsetGet('src').vars.value }}"{% endif %} />
+                <a class="dz-remove" href="javascript:undefined;" data-dz-remove><i class="fa-times"></i> Remove</a>
+            </div>
+            <div class="dz-details">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+                    </div>
+                </div>
+                {% if not child %}
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <strong>Details:</strong>
+                        </div>
+                        <div class="col-xs-8">
+                            <div class="dz-size" data-dz-size>Uploaded</div>
+                        </div>
+                    </div>
+                {% endif %}
+                <div class="dz-image-form" data-prototype="<div>__widget__</div>" data-count="0">
+                    {% if child %}{{ form_row(child) }}{% endif %}
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    {% endspaceless %}
+{% endmacro %}
+
+{% block content %}
+
+    {% stylesheets
+        '@LineStormBlogBundle/Resources/public/css/dropzone.css'
+        filter='cssrewrite' output='compiled/css/blog.css' %}
+     <link rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
+
+    {% javascripts
+        '@LineStormBlogBundle/Resources/public/js/dropzone.js'
+        output='compiled/js/blog.js' %}
+        <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+
+    <style type="text/css">
+        .img-preview {
+        }
+        .img-preview > img {
+            margin: auto;
+            position: relative;
+            display: block;
+            max-height: 400px;
+            max-width: 100%;
+        }
+        .dropzone {
+            max-height: 400px;
+            height: 100%;
+            margin: 20px 0;
+            min-height: 200px;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+        // setup dropzone
+        Dropzone.autoDiscover = false;
+
+        var $form;
+        var $articleCollectionHolder;
+        var $dropzone;
+        var carrosselDropZone;
+
+        var serializeForm = function($form){
+
+            var self = this,
+                json = {},
+                push_counters = {},
+                patterns = {
+                    "validate": /^[a-zA-Z][a-zA-Z0-9_]*(?:\[(?:\d*|[a-zA-Z0-9_]+)\])*$/,
+                    "key":      /[a-zA-Z0-9_]+|(?=\[\])/g,
+                    "push":     /^$/,
+                    "fixed":    /^\d+$/,
+                    "named":    /^[a-zA-Z0-9_]+$/
+                };
+
+
+            this.build = function(base, key, value){
+                base[key] = value;
+                return base;
+            };
+
+            this.push_counter = function(key){
+                if(push_counters[key] === undefined){
+                    push_counters[key] = 0;
+                }
+                return push_counters[key]++;
+            };
+
+            $.each($form, function(i,v){
+
+                // skip invalid keys
+                if(!patterns.validate.test(this.name)){
+                    return;
+                }
+
+                var k,
+                    keys = i.match(patterns.key),
+                    merge = v,
+                    reverse_key = i;
+
+                while((k = keys.pop()) !== undefined){
+
+                    // adjust reverse_key
+                    reverse_key = reverse_key.replace(new RegExp("\\[" + k + "\\]$"), '');
+
+                    // push
+                    if(k.match(patterns.push)){
+                        merge = self.build([], self.push_counter(reverse_key), merge);
+                    }
+
+                    // fixed
+                    else if(k.match(patterns.fixed)){
+                        merge = self.build([], k, merge);
+                    }
+
+                    // named
+                    else if(k.match(patterns.named)){
+                        merge = self.build({}, k, merge);
+                    }
+                }
+
+                json = $.extend(true, json, merge);
+            });
+
+            return json;
+        };
+
+        var parseError = function(e, p){
+            if(p === undefined){
+                p = 'error';
+            }
+            var errors = {}, childErrors;
+            for(var i in e){
+                if(i === 'errors'){
+                    errors[p] = e[i];
+                } else if ("string" === typeof e[i] || e[i] instanceof Array){
+                    errors[i] = e[i];
+                } else {
+                    childErrors = parseError(e[i], i);
+                    for (var attrname in childErrors) { errors[attrname] = childErrors[attrname]; }
+                }
+            }
+
+            return errors;
+        };
+
+        var saveForm = function(callback_success, callback_failure){
+            var form, data, field, fname, method;
+
+            form = $('form[name="linestorm_blog_form_media"]');
+            method = form[0].method;
+
+            callback_success = callback_success || null;
+            callback_failure = callback_failure || null;
+
+            data = {};
+
+            for(var i=0 ; i<form[0].length ; ++i){
+                field = form[0][i];
+                if(field.name){
+                    fname = field.name;
+
+                    if(field.name === '_method'){
+                        method = field.value;
+                    } else if(field.type === 'radio'){
+                        data[fname] = data[fname] || [];
+                        data[fname].push(field.value);
+                    } else if(field.type === 'checkbox'){
+                        data[fname] = field.checked ? field.value : null;
+                    } else {
+                        if(field.name.match(/\[\]$/)){
+                            fname = field.name.replace(/\[\]$/, '');
+                            data[fname] = data[fname] || [];
+                            data[fname].push($(field).val());
+                        } else {
+                            data[fname] = $(field).val();
+                        }
+                    }
+                }
+            }
+
+            var sData = serializeForm(data);
+
+            $.ajax({
+                url: form[0].action,
+                type: method,
+                data: JSON.stringify(sData),
+                dataType: 'json',
+                success: callback_success,
+                error: callback_failure
+            });
+
+        };
+
+        $(document).ready(function(){
+            $form = $('form[name="linestorm_blog_form_media"]');
+            $dropzone = $('.dropzone');
+
+            carrosselDropZone = new Dropzone($dropzone[0], {
+                url: $dropzone.data('url'),
+                maxFiles: 1,
+                acceptedFiles: 'image/*',
+                init: function(){
+                    this.on("success", function(file, response) {
+                        if(file.xhr.status == 200){
+                            alert('An identical file already exists.');
+                        } else {
+                            $form.find('.img-preview > img').attr('src', response.src);
+                            $form.find('input[name*="[src]"]').val(response.src);
+                            $form.find('input[name*="[hash]"]').val(response.hash);
+                        }
+                        this.removeFile(file);
+                    });
+                    this.on("error", function(file, response) {
+                        this.removeFile(file);
+                        alert("Cannot add file: "+response);
+                    });
+                },
+                previewTemplate: "{{ fn.dzPreview()|e('js') }}"
+            });
+
+            $form.on('submit', function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                $('#FormErrors').slideUp(function(){ $(this).html(''); });
+                saveForm(function(on, status, xhr){
+                    if(xhr.status === 200){
+                        alert('updated!');
+                    } else if(xhr.status === 201) {
+                        alert('created!');
+                    } else {
+                        alert('saved ('+xhr.status+')!');
+                    }
+                }, function(e, status, ex){
+                    if(e.status === 400){
+                        if(e.responseJSON){
+                            var errors = parseError(e.responseJSON.errors);
+                            var str = '';
+                            for(var i in errors){
+                                if(errors[i].length)
+                                    str += "<p class=''><strong style='text-transform:capitalize;'>"+i+":</strong> "+errors[i].join(', ')+"</p>";
+                             }
+                            $('#FormErrors').html(str).slideDown();
+                        } else {
+                            alert(status);
+                        }
+                    }
+                });
+
+                return false;
+            });
+
+
+            // set up the sortable content
+            $articleCollectionHolder.sortable({
+                handle: '.item-reorder',
+                axis: 'y'
+            });
+        });
+
+
+
+    </script>
+
+
+    <div id="FormErrors" class="alert alert-danger" style="display: none;">
+
+    </div>
+
+    {{ form_start(form) }}
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="img-preview">
+                    <img src="{{ form.src.vars.value }}">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="dropzone" data-url="{{ path('linestorm_blog_media_upload_edit', {id:image.id}) }}"></div>
+            </div>
+        </div>
+
+        {% for child in form %}
+            {{ form_row(child) }}
+        {% endfor %}
+
+        <hr />
+
+        <div class="form-group">
+            <div class="col-sm-12">
+                <button type="submit" class="btn btn-default post-save">Save</button>
+            </div>
+        </div>
+
+    {{ form_end(form) }}
+
+{% endblock %}

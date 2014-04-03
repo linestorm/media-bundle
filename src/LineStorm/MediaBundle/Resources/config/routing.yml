@@ -1,0 +1,8 @@
+linestorm_blog_media_module_admin:
+  prefix:       /
+  resource:     "routing/admin.yml"
+
+linestorm_blog_media_module_api:
+  type:         rest
+  prefix:       /api
+  resource:     "routing/api.yml"

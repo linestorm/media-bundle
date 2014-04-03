@@ -1,0 +1,12 @@
+#
+# DEFAULT FORM TYPES
+#
+parameters: ~
+
+services:
+
+  linestorm.blog.form.type.media:
+        class: LineStorm\BlogBundle\Form\MediaFormType
+        arguments: [@linestorm.blog.media_manager]
+        tags:
+            - { name: form.type, alias: linestorm_blog_form_media }

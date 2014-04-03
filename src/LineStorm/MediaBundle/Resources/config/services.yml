@@ -1,0 +1,17 @@
+parameters:
+  linestorm.blog.module.media.class:            LineStorm\MediaBundle\Module\MediaModule
+  linestorm.blog.module.media.manager.class:    LineStorm\MediaBundle\Media\MediaManager
+
+services:
+
+  linestorm.blog.module.media:
+    class: %linestorm.blog.module.media.class%
+    arguments: [@linestorm.blog.media_manager]
+    tags:
+      - { name: linestorm.blog.module }
+
+  #
+  # MEDIA MANAGER
+  #
+  linestorm.blog.media_manager:
+        class: %linestorm.blog.module.media.manager.class%

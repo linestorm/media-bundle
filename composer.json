@@ -1,0 +1,21 @@
+{
+    "name": "linestorm/media-bundle",
+    "description": "Media Bundle for symfony 2.3",
+    "require": {
+        "php": ">=5.3.0",
+        "symfony/symfony": ">=2.3",
+        "linestorm/blog-bundle" : "dev-master"
+    },
+    "authors": [
+        {
+            "name": "Andy Thorne",
+            "email": "contrabandvr@gmail.com",
+            "homepage": "http://www.andy-thorne.co.uk",
+            "role": "Senior Developer"
+        }
+    ],
+    "autoload": {
+        "psr-0": {"LineStorm\\": "src/"}
+    },
+    "minimum-stability": "dev"
+}

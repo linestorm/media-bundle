@@ -1,0 +1,30 @@
+linestorm_blog_admin_media_module:
+    pattern:  /
+    defaults: { _controller: LineStormBlogBundle:Admin:list }
+
+linestorm_blog_admin_module_media_create:
+    pattern:  /new
+    defaults: { _controller: LineStormBlogBundle:Admin:new }
+
+linestorm_blog_admin_module_media_view:
+    pattern:  /{id}
+    defaults: { _controller: LineStormBlogBundle:Admin:view }
+    requirements:
+       id: \d+
+
+linestorm_blog_admin_module_media_edit:
+    pattern:  /{id}/edit
+    defaults: { _controller: LineStormBlogBundle:Admin:edit }
+    requirements:
+       id: \d+
+
+linestorm_blog_admin_module_media_upload_edit:
+    path: /{id}/upload
+    defaults: { _controller: "LineStormBlogBundle:Admin:uploadEdit" }
+    requirements:
+       id: \d+
+
+linestorm_blog_admin_module_media_media_upload:
+    path: /upload
+    defaults: { _controller: "LineStormBlogBundle:Admin:upload" }
+
