@@ -2,10 +2,10 @@
 
 namespace LineStorm\MediaBundle;
 
-use LineStorm\BlogBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use LineStorm\MediaBundle\DependencyInjection\ContainerBuilder\MediaCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use LineStorm\BlogBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass as LocalDoctrineOrmMappingsPass;
 
 class LineStormMediaBundle extends Bundle
