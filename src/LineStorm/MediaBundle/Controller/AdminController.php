@@ -91,13 +91,13 @@ class AdminController extends Controller
             $media = $e->getEntity();
             $code = 200;
         }
-        catch(HttpException $e)
-        {
-            throw $e;
-        }
         catch(\Exception $e)
         {
-            throw new HttpException(400, 'Upload Invalid', $e);
+            $view = View::create(array(
+                'error'=> $e->getMessage(),
+            ), 400);
+            $view->setFormat('json');
+            return $this->get('fos_rest.view_handler')->handle($view);
         }
 
         $view = View::create(new \LineStorm\MediaBundle\Document\Media($media), $code);
@@ -131,7 +131,9 @@ class AdminController extends Controller
         }
         catch(HttpException $e)
         {
-            throw $e;
+            $view = View::create($e);
+            $view->setFormat('json');
+            return $this->get('fos_rest.view_handler')->handle($view);
         }
         catch(\Exception $e)
         {
@@ -144,6 +146,14 @@ class AdminController extends Controller
     }
 
 
+    /**
+     * Handle a file upload
+     *
+     * @param Media|null $entity The entity to store into
+     *
+     * @return Media
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     */
     private function doUpload($entity = null)
     {
         $mediaManager = $this->get('linestorm.blog.media_manager');
@@ -157,17 +167,48 @@ class AdminController extends Controller
         if($totalFiles === 1) {
             /* @var $file \Symfony\Component\HttpFoundation\File\UploadedFile */
             $file = array_shift($files);
-            $media = $mediaManager->store($file, $entity);
-            if (!($media instanceof Media))
+
+            if($file->isValid())
             {
-                throw new HttpException(400, 'Upload Invalid');
+                $media = $mediaManager->store($file, $entity);
+                if (!($media instanceof Media))
+                {
+                    throw new HttpException(400, 'Upload Invalid');
+                }
+
+                return $media;
+            }
+            else
+            {
+                switch($file->getError())
+                {
+                    case UPLOAD_ERR_INI_SIZE:
+                        throw new HttpException(400, 'Upload Invalid: File too large for server');
+                        break;
+                    case UPLOAD_ERR_FORM_SIZE:
+                        throw new HttpException(400, 'Upload Invalid: File too large for form');
+                        break;
+                    case UPLOAD_ERR_PARTIAL:
+                        throw new HttpException(400, 'Upload Invalid: Only a partial file was recieved');
+                        break;
+                    case UPLOAD_ERR_NO_FILE:
+                        throw new HttpException(400, 'Upload Invalid: No file given');
+                        break;
+                    case UPLOAD_ERR_NO_TMP_DIR:
+                        throw new HttpException(400, 'Upload Invalid: Unable to store (1)');
+                        break;
+                    case UPLOAD_ERR_CANT_WRITE:
+                        throw new HttpException(400, 'Upload Invalid: Unable to store (2)');
+                        break;
+                    case UPLOAD_ERR_EXTENSION:
+                        throw new HttpException(400, 'Upload Invalid: Invalid Extension');
+                        break;
+                }
             }
         }
         else
         {
             throw new HttpException(400, 'Upload Invalid: Too Many Files.');
         }
-
-        return $media;
     }
 }

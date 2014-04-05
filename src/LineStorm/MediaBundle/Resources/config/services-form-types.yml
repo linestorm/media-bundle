@@ -5,6 +5,12 @@ parameters: ~
 
 services:
 
+  linestorm.blog.form.type.widget.mediaentity:
+        class: LineStorm\MediaBundle\Form\Type\MediaEntityType
+        arguments: [@linestorm.blog.media_manager]
+        tags:
+            - { name: form.type, alias: mediaentity }
+
   linestorm.blog.form.type.media:
         class: LineStorm\MediaBundle\Form\MediaFormType
         arguments: [@linestorm.blog.media_manager]

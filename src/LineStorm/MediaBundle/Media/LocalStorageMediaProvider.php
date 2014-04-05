@@ -10,6 +10,12 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\SecurityContext;
 
+/**
+ * Local storage media provider. This provider will store all images on the local disk.
+ *
+ * Class LocalStorageMediaProvider
+ * @package LineStorm\MediaBundle\Media
+ */
 class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaProviderInterface
 {
     protected $id = 'local_storeage';
@@ -41,26 +47,41 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
      */
     private $storeFolder = '/var/www/andythorne/web/media/';
 
+    /**
+     * @param EntityManager   $em         The Entity Manager to use
+     * @param string          $mediaClass The Entity class
+     * @param SecurityContext $secutiryContext
+     */
     function __construct(EntityManager $em, $mediaClass, SecurityContext $secutiryContext)
     {
-        $this->em = $em;
+        $this->em    = $em;
         $this->class = $mediaClass;
-        $token = $secutiryContext->getToken();
+        $token       = $secutiryContext->getToken();
         if($token)
+        {
             $this->user = $token->getUser();
+        }
     }
 
-
+    /**
+     * @inheritdoc
+     */
     public function find($id)
     {
         return $this->em->getRepository($this->class)->find($id);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function findByHash($hash)
     {
-        return $this->em->getRepository($this->class)->findOneBy(array( 'hash' => $hash));
+        return $this->em->getRepository($this->class)->findOneBy(array('hash' => $hash));
     }
 
+    /**
+     * @inheritdoc
+     */
     public function findBy(array $criteria, array $order = array(), $limit = null, $offset = null)
     {
         $repo = $this->em->getRepository($this->class);
@@ -68,9 +89,12 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
         return $repo->findBy($criteria, $order, $limit, $offset);
     }
 
-    public function store(File $file, Media $media=null)
+    /**
+     * @inheritdoc
+     */
+    public function store(File $file, Media $media = null)
     {
-        $hash = sha1_file($file->getPathname());
+        $hash   = sha1_file($file->getPathname());
         $entity = $this->findByHash($hash);
         if($entity instanceof Media)
         {
@@ -85,42 +109,49 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
         if($file instanceof UploadedFile)
         {
             $extension = $file->getClientOriginalExtension();
-            $oldName = $file->getClientOriginalName();
+            $oldName   = $file->getClientOriginalName();
         }
         else
         {
             $extension = $file->getExtension();
-            $oldName = $file->getFilename();
+            $oldName   = $file->getFilename();
         }
 
         $fileMime = $file->getMimeType();
-        if (array_key_exists($fileMime, $this->accept) && in_array($extension, $this->accept[$fileMime])) {
+        if(array_key_exists($fileMime, $this->accept) && in_array(strtolower($extension), $this->accept[$fileMime]))
+        {
             $newFileName = md5(time() . rand()) . "." . $extension;
-            $file = $file->move($this->storeFolder, $newFileName);
+            $file        = $file->move($this->storeFolder, $newFileName);
         }
         else
         {
-            throw new MediaFileDeniedException();
+            throw new MediaFileDeniedException($fileMime);
         }
 
         if($file instanceof File)
         {
             /** @var Media $media */
             if(!$media->getTitle())
+            {
                 $media->setTitle($oldName);
+            }
 
             $media->setNameOriginal($oldName);
             $media->setName($file->getFilename());
-            $media->setSrc('/media/'.$file->getFilename());
+            $media->setSrc('/media/' . $file->getFilename());
             $media->setHash(sha1_file($file->getPathname()));
             $media->setUploader($this->user);
 
             $this->em->persist($media);
             $this->em->flush($media);
+
             return $media;
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function update(Media $media)
     {
         $this->em->persist($media);

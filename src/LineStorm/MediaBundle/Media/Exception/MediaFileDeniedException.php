@@ -2,10 +2,17 @@
 
 namespace LineStorm\MediaBundle\Media\Exception;
 
+/**
+ * Class MediaFileDeniedException
+ * @package LineStorm\MediaBundle\Media\Exception
+ */
 class MediaFileDeniedException extends \Exception
 {
-    function __construct($message='This media type is not allowed')
+    /**
+     * @param string $mediaType
+     */
+    function __construct($mediaType)
     {
-        parent::__construct($message);
+        parent::__construct("This media type is not allowed: {$mediaType}");
     }
 }

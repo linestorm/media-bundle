@@ -2,7 +2,10 @@
 
 namespace LineStorm\MediaBundle\Media;
 
-
+/**
+ * Class AbstractMediaProvider
+ * @package LineStorm\MediaBundle\Media
+ */
 abstract class AbstractMediaProvider
 {
     protected $id;
