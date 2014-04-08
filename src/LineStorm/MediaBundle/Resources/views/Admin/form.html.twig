@@ -36,15 +36,15 @@
 {% block content %}
 
     {% stylesheets
-        '@LineStormMediaBundle/Resources/public/css/dropzone.css'
+        'vendor/dropzone/downloads/css/dropzone.css'
         '@LineStormMediaBundle/Resources/public/css/admin/media.css'
         filter='cssrewrite' output='compiled/css/media.css' %}
      <link rel="stylesheet" href="{{ asset_url }}" />
     {% endstylesheets %}
 
     {% javascripts
+        'vendor/dropzone/downloads/dropzone.min.js'
         '@LineStormCmsBundle/Resources/public/js/api.js'
-        '@LineStormMediaBundle/Resources/public/js/dropzone.js'
         '@LineStormMediaBundle/Resources/public/js/admin/media.js'
         output='compiled/js/media.js' %}
         <script type="text/javascript" src="{{ asset_url }}"></script>
