@@ -3,8 +3,8 @@
 namespace LineStorm\MediaBundle\Module;
 
 use LineStorm\MediaBundle\Media\MediaManager;
-use LineStorm\BlogBundle\Module\AbstractModule;
-use LineStorm\BlogBundle\Module\ModuleInterface;
+use LineStorm\CmsBundle\Module\AbstractModule;
+use LineStorm\CmsBundle\Module\ModuleInterface;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -32,8 +32,8 @@ class MediaModule extends AbstractModule implements ModuleInterface
     public function getNavigation()
     {
         return array(
-            'View All' => array('linestorm_blog_admin_module_media', array()),
-            'New Image' => array('linestorm_blog_admin_module_media_create', array()),
+            'View All' => array('linestorm_cms_admin_module_media', array()),
+            'New Image' => array('linestorm_cms_admin_module_media_create', array()),
         );
     }
 
@@ -44,7 +44,7 @@ class MediaModule extends AbstractModule implements ModuleInterface
      */
     public function getHome()
     {
-        return 'linestorm_blog_admin_module_media';
+        return 'linestorm_cms_admin_module_media';
     }
 
     /**

@@ -65,6 +65,6 @@ class MediaFormType extends AbstractType
      */
     public function getName()
     {
-        return 'linestorm_blog_form_media';
+        return 'linestorm_cms_form_media';
     }
 }

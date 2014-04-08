@@ -1,8 +1,8 @@
-linestorm_blog_media_module_admin:
+linestorm_cms_module_media_admin:
   prefix:       /
   resource:     "routing/admin.yml"
 
-linestorm_blog_media_module_api:
+linestorm_cms_module_media_api:
   type:         rest
   prefix:       /api
   resource:     "routing/api.yml"

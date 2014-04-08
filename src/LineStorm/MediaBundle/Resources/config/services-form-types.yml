@@ -5,14 +5,14 @@ parameters: ~
 
 services:
 
-  linestorm.blog.form.type.widget.mediaentity:
+  linestorm.cms.form.type.widget.mediaentity:
         class: LineStorm\MediaBundle\Form\Type\MediaEntityType
-        arguments: [@linestorm.blog.media_manager]
+        arguments: [@linestorm.cms.media_manager]
         tags:
             - { name: form.type, alias: mediaentity }
 
-  linestorm.blog.form.type.media:
+  linestorm.cms.form.type.media:
         class: LineStorm\MediaBundle\Form\MediaFormType
-        arguments: [@linestorm.blog.media_manager]
+        arguments: [@linestorm.cms.media_manager]
         tags:
-            - { name: form.type, alias: linestorm_blog_form_media }
+            - { name: form.type, alias: linestorm_cms_form_media }

@@ -1,4 +1,4 @@
-{% extends 'LineStormBlogBundle:Admin:layout.html.twig' %}
+{% extends 'LineStormCmsBundle:Admin:layout.html.twig' %}
 
 {% import _self as fn %}
 {% macro dzPreview(child) %}
@@ -43,7 +43,7 @@
     {% endstylesheets %}
 
     {% javascripts
-        '@LineStormBlogBundle/Resources/public/js/api.js'
+        '@LineStormCmsBundle/Resources/public/js/api.js'
         '@LineStormMediaBundle/Resources/public/js/dropzone.js'
         '@LineStormMediaBundle/Resources/public/js/admin/media.js'
         output='compiled/js/media.js' %}
@@ -65,7 +65,7 @@
         </div>
         <div class="row">
             <div class="col-xs-12">
-                <div class="dropzone" data-url="{% if image %}{{ path('linestorm_blog_admin_module_media_upload_edit', {id:image.id}) }}{% else %}{{ path('linestorm_blog_admin_module_media_upload') }}{% endif %}" data-prototype="{{ fn.dzPreview()|e('html_attr') }}"></div>
+                <div class="dropzone" data-url="{% if image %}{{ path('linestorm_cms_admin_module_media_upload_edit', {id:image.id}) }}{% else %}{{ path('linestorm_cms_admin_module_media_upload') }}{% endif %}" data-prototype="{{ fn.dzPreview()|e('html_attr') }}"></div>
             </div>
         </div>
 

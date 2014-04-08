@@ -4,7 +4,7 @@ namespace LineStorm\MediaBundle\Controller\Api;
 
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\View\View;
-use LineStorm\BlogBundle\Controller\Api\AbstractApiController;
+use LineStorm\CmsBundle\Controller\Api\AbstractApiController;
 use LineStorm\MediaBundle\Model\Media;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -23,7 +23,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
      * @return mixed
      * @throws AccessDeniedException
      *
-     * [GET] /blog/admin/modules/media/api/media.{_format}
+     * [GET] /cms/admin/modules/media/api/media.{_format}
      */
     public function getAllAction()
     {
@@ -32,7 +32,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
             throw new AccessDeniedException();
         }
 
-        $mediaManager = $this->get('linestorm.blog.media_manager');
+        $mediaManager = $this->get('linestorm.cms.media_manager');
 
         $provider = $this->getRequest()->query->get('p', null);
         $limit = $this->getRequest()->query->get('limit', 50);
@@ -56,7 +56,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
             throw new AccessDeniedException();
         }
 
-        $mediaManager = $this->get('linestorm.blog.media_manager');
+        $mediaManager = $this->get('linestorm.cms.media_manager');
 
         $provider = $this->getRequest()->query->get('p', null);
 
@@ -79,14 +79,14 @@ class MediaController extends AbstractApiController implements ClassResourceInte
             throw new AccessDeniedException();
         }
 
-        $mediaManager = $this->get('linestorm.blog.media_manager');
+        $mediaManager = $this->get('linestorm.cms.media_manager');
 
         $request = $this->getRequest();
         $form = $this->getForm();
 
         $formValues = json_decode($request->getContent(), true);
 
-        $form->submit($formValues['linestorm_blog_form_media']);
+        $form->submit($formValues['linestorm_cms_form_media']);
 
         if ($form->isValid())
         {
@@ -94,7 +94,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
             $updatedMedia = $form->getData();
             $mediaManager->update($updatedMedia);
 
-            $view = $this->createResponse(array('location' => $this->generateUrl('linestorm_blog_media_module_api_get_media', array( 'id' => $form->getData()->getId()))), 200);
+            $view = $this->createResponse(array('location' => $this->generateUrl('linestorm_cms_module_media_api_get_media', array( 'id' => $form->getData()->getId()))), 200);
         }
         else
         {
@@ -112,7 +112,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
             throw new AccessDeniedException();
         }
 
-        $mediaManager = $this->get('linestorm.blog.media_manager');
+        $mediaManager = $this->get('linestorm.cms.media_manager');
 
         $provider = $this->getRequest()->query->get('p', null);
 
@@ -123,7 +123,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
 
         $formValues = json_decode($request->getContent(), true);
 
-        $form->submit($formValues['linestorm_blog_form_media']);
+        $form->submit($formValues['linestorm_cms_form_media']);
 
         if ($form->isValid())
         {
@@ -131,7 +131,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
             $updatedMedia = $form->getData();
             $mediaManager->update($updatedMedia);
 
-            $view = $this->createResponse(array('location' => $this->generateUrl('linestorm_blog_media_module_api_get_media', array( 'id' => $form->getData()->getId()))), 200);
+            $view = $this->createResponse(array('location' => $this->generateUrl('linestorm_cms_module_media_api_get_media', array( 'id' => $form->getData()->getId()))), 200);
         }
         else
         {
@@ -144,7 +144,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
 
     private function getForm($entity = null)
     {
-        return $this->createForm('linestorm_blog_form_media', $entity);
+        return $this->createForm('linestorm_cms_form_media', $entity);
     }
 
 }

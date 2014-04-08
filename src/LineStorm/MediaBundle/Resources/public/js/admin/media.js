@@ -26,7 +26,7 @@ var parseError = function(e, p){
 };
 
 $(document).ready(function(){
-    $form = $('form[name="linestorm_blog_form_media"]');
+    $form = $('form[name="linestorm_cms_form_media"]');
     $dropzone = $('.dropzone');
 
     carrosselDropZone = new Dropzone($dropzone[0], {

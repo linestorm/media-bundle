@@ -1,4 +1,4 @@
-{% extends 'LineStormBlogBundle:Admin:index.html.twig' %}
+{% extends 'LineStormCmsBundle:Admin:index.html.twig' %}
 
 {% block page_title %}View All Media{% endblock %}
 
@@ -21,7 +21,7 @@
 
         function requestPage(){
             $.ajax({
-                url: "{{ path('linestorm_blog_media_module_api_get_media_all') }}",
+                url: "{{ path('linestorm_cms_module_media_api_get_media_all') }}",
                 data: {
                     page: page,
                     limit: 50

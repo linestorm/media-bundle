@@ -89,7 +89,7 @@ class MediaManager implements \Countable
      * Store the file into the bank
      *
      * @param File $file
-     * @param \LineStorm\BlogBundle\Model\Media $media
+     * @param \LineStorm\CmsBundle\Model\Media $media
      * @param string $provider
      *
      * @return Media

@@ -11,18 +11,18 @@ class MediaCompilerPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('linestorm.blog.media_manager')) {
+        if (!$container->hasDefinition('linestorm.cms.media_manager')) {
             return;
         }
 
         $definition = $container->getDefinition(
-            'linestorm.blog.media_manager'
+            'linestorm.cms.media_manager'
         );
 
-        $defaultProvider = $container->getParameter('linestorm.blog.media_provider.default');
+        $defaultProvider = $container->getParameter('linestorm.cms.media_provider.default');
 
         $taggedServices = $container->findTaggedServiceIds(
-            'linestorm.blog.media_provider'
+            'linestorm.cms.media_provider'
         );
 
         foreach ($taggedServices as $id => $attributes) {

@@ -20,7 +20,7 @@ class AdminController extends Controller
             throw new AccessDeniedException();
         }
 
-        $mediaManager = $this->get('linestorm.blog.media_manager');
+        $mediaManager = $this->get('linestorm.cms.media_manager');
 
         $providers = $mediaManager->getMediaProviders();
 
@@ -38,12 +38,12 @@ class AdminController extends Controller
             throw new AccessDeniedException();
         }
 
-        $mediaManager = $this->get('linestorm.blog.media_manager');
+        $mediaManager = $this->get('linestorm.cms.media_manager');
 
         $media = $mediaManager->find($id);
 
-        $form = $this->createForm('linestorm_blog_form_media', $media, array(
-            'action' => $this->generateUrl('linestorm_blog_media_module_api_put_media', array('id' => $media->getId())),
+        $form = $this->createForm('linestorm_cms_form_media', $media, array(
+            'action' => $this->generateUrl('linestorm_cms_module_media_api_put_media', array('id' => $media->getId())),
             'method' => 'PUT',
         ));
 
@@ -61,8 +61,8 @@ class AdminController extends Controller
             throw new AccessDeniedException();
         }
 
-        $form = $this->createForm('linestorm_blog_form_media', null, array(
-            'action' => $this->generateUrl('linestorm_blog_media_module_api_post_media'),
+        $form = $this->createForm('linestorm_cms_form_media', null, array(
+            'action' => $this->generateUrl('linestorm_cms_module_media_api_post_media'),
             'method' => 'POST',
         ));
 
@@ -112,7 +112,7 @@ class AdminController extends Controller
             throw new AccessDeniedException();
         }
 
-        $mediaManager = $this->get('linestorm.blog.media_manager');
+        $mediaManager = $this->get('linestorm.cms.media_manager');
         $image = $mediaManager->find($id);
 
         if(!($image instanceof Media))
@@ -156,7 +156,7 @@ class AdminController extends Controller
      */
     private function doUpload($entity = null)
     {
-        $mediaManager = $this->get('linestorm.blog.media_manager');
+        $mediaManager = $this->get('linestorm.cms.media_manager');
 
         $request = $this->getRequest();
         $files = $request->files->all();

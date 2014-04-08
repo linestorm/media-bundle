@@ -1,4 +1,4 @@
-Media Module for LineStorm Blog Bundle
-========================================
+Media Module for LineStorm CMS
+==============================
 
-Media Module for the LineStorm BlogBundle
+Media Module for the LineStorm CMS

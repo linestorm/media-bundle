@@ -26,6 +26,6 @@ class LineStormMediaExtension extends Extension
         $loader->load('services.yml');
         $loader->load('services-form-types.yml');
 
-        $container->setParameter('linestorm.blog.media_provider.default', $config['default_provider']);
+        $container->setParameter('linestorm.cms.media_provider.default', $config['default_provider']);
     }
 }

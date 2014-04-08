@@ -8,7 +8,7 @@ use JMS\Serializer\Annotation as JMS;
 
 /**
  * Class Media
- * @package LineStorm\BlogBundle\Model
+ * @package LineStorm\CmsBundle\Model
  */
 class Media
 {
