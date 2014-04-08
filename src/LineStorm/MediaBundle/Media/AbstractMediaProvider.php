@@ -8,17 +8,33 @@ namespace LineStorm\MediaBundle\Media;
  */
 abstract class AbstractMediaProvider
 {
+    /**
+     * ID of the media provider
+     *
+     * @var string
+     */
     protected $id;
 
-    protected $class;
+    /**
+     * The name of the form service
+     *
+     * @var string
+     */
+    protected $form;
 
+    /**
+     * @inheritdoc
+     */
     public function getId()
     {
         return $this->id;
     }
 
-    public function getEntityClass()
+    /**
+     * @inheritdoc
+     */
+    public function getForm()
     {
-        return $this->class;
+        return $this->form;
     }
 } 

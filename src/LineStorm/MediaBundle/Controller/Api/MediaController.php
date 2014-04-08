@@ -144,7 +144,10 @@ class MediaController extends AbstractApiController implements ClassResourceInte
 
     private function getForm($entity = null)
     {
-        return $this->createForm('linestorm_cms_form_media', $entity);
+        $mediaManager = $this->get('linestorm.cms.media_manager');
+        $provider = $mediaManager->getDefaultProviderInstance();
+
+        return $this->createForm($provider->getForm(), $entity);
     }
 
 }

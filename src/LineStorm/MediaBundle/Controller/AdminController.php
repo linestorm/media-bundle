@@ -39,16 +39,17 @@ class AdminController extends Controller
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
+        $provider = $mediaManager->getDefaultProviderInstance();
 
         $media = $mediaManager->find($id);
 
-        $form = $this->createForm('linestorm_cms_form_media', $media, array(
+        $form = $this->createForm($provider->getForm(), $media, array(
             'action' => $this->generateUrl('linestorm_cms_module_media_api_put_media', array('id' => $media->getId())),
             'method' => 'PUT',
         ));
 
         return $this->render('LineStormMediaBundle:Admin:edit.html.twig', array(
-            'image'      => $media,
+            'image'     => $media,
             'form'      => $form->createView(),
         ));
     }
@@ -61,7 +62,10 @@ class AdminController extends Controller
             throw new AccessDeniedException();
         }
 
-        $form = $this->createForm('linestorm_cms_form_media', null, array(
+        $mediaManager = $this->get('linestorm.cms.media_manager');
+        $provider = $mediaManager->getDefaultProviderInstance();
+
+        $form = $this->createForm($provider->getForm(), null, array(
             'action' => $this->generateUrl('linestorm_cms_module_media_api_post_media'),
             'method' => 'POST',
         ));

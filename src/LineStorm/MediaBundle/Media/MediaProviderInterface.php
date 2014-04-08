@@ -22,11 +22,11 @@ interface MediaProviderInterface
     public function getId();
 
     /**
-     * Get the storeage media class name
+     * Get a edit/new Form for the media
      *
      * @return string
      */
-    public function getEntityClass();
+    public function getForm();
 
     /**
      * Get an image from storage

@@ -1,4 +1,80 @@
-Media Module for LineStorm CMS
-==============================
+Post Module for LineStorm Blog Bundle
+========================================
 
-Media Module for the LineStorm CMS
+Post Module for the LineStorm BlogBundle. It comes bundled with the Tag, Article and Gallery components. It also requires
+the `linestorm/media-bundle`.
+
+Installation
+============
+This module will provide functionality to post blog type content to the LineStorm CMS.
+
+1. Download bundle using composer
+2. Enable the Bundle
+3. Configure the Bundle
+4. Installing Assets
+
+Step 1: Download bundle using composer
+--------------------------------------
+
+Add `linestorm/media-bundle` to your `composer.json` file, or download it by running the command:
+
+```bash
+$ php composer.phar require linestorm/media-bundle
+```
+
+Composer will install the bundle to your project's vendor/ directory.
+
+Step 2: Enable the bundle
+-------------------------
+
+Enable the media bundle in the `app/AppKernel.php`:
+
+```php
+public function registerBundles()
+{
+    $bundles = array(
+        // ...
+        new LineStorm\MediaBundle\MediaBundle(),
+    );
+}
+```
+
+Step 3: Configure the Bundle
+----------------------------
+
+Add the default media provider in the linestorm_cms_media namespace inside the `app/config/config.yml` file. The default
+is local_storeage
+
+```yml
+line_storm_media:
+  default_provider: local_storeage
+```
+
+If you want to use local_storage, you will need to add it to your `Resources/config/services.yml` file:
+
+```yml
+parameters:
+  linestorm.cms.media_provider.local_storeage.entity.class: Acme\DemoBundle\Entity\Media
+
+services:
+  linestorm.cms.media_provider.local_storeage:
+        class: LineStorm\MediaBundle\Media\LocalStorageMediaProvider
+        arguments:
+            - @doctrine.orm.default_entity_manager
+            - %linestorm.cms.media_provider.local_storeage.entity.class%
+            - @security.context
+            - %kernel.root_dir%/../web
+            - /media/
+        tags:
+            - { name: linestorm.cms.media_provider }
+```
+
+See [Creating a media provder](src/LineStorm/MediaBundle/Resources/doc/media_provider.md) for creating your own provider.
+
+
+Step 4: Installing Assets
+-------------------------
+
+If you use bower, add the dependencies within bower.json. If you do not, you will need to add them manually into
+web/vendor.
+

@@ -9,6 +9,7 @@ use LineStorm\MediaBundle\Model\Media;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Local storage media provider. This provider will store all images on the local disk.
@@ -18,15 +19,29 @@ use Symfony\Component\Security\Core\SecurityContext;
  */
 class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaProviderInterface
 {
+    /**
+     * @var string
+     */
     protected $id = 'local_storeage';
+
+    /**
+     * @var string
+     */
+    protected $form = 'linestorm_cms_form_media';
 
     /**
      * @var EntityManager
      */
     protected $em;
 
+    /**
+     * @var string
+     */
     protected $class;
 
+    /**
+     * @var UserInterface|null
+     */
     protected $user;
 
     /**
@@ -41,26 +56,43 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     );
 
     /**
-     * Where the files are stored!
+     * Where the files are stored in the web folder
      *
      * @var string
      */
-    private $storeFolder = '/var/www/andythorne/web/media/';
+    private $storeDirectory;
 
     /**
-     * @param EntityManager   $em         The Entity Manager to use
-     * @param string          $mediaClass The Entity class
-     * @param SecurityContext $secutiryContext
+     * This is the local path to the web folder
+     *
+     * @var string
      */
-    function __construct(EntityManager $em, $mediaClass, SecurityContext $secutiryContext)
+    private $storePath;
+
+    /**
+     * @param EntityManager $em The Entity Manager to use
+     * @param string $mediaClass The Entity class
+     * @param SecurityContext $secutiryContext
+     * @param $webRoot
+     * @param string $dir
+     */
+    function __construct(EntityManager $em, $mediaClass, SecurityContext $secutiryContext, $webRoot, $dir)
     {
         $this->em    = $em;
         $this->class = $mediaClass;
+        $this->storePath = $webRoot;
+        $this->storeDirectory = $dir;
+
         $token       = $secutiryContext->getToken();
         if($token)
         {
             $this->user = $token->getUser();
         }
+    }
+
+    public function getEntityClass()
+    {
+        return $this->class;
     }
 
     /**
@@ -121,7 +153,7 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
         if(array_key_exists($fileMime, $this->accept) && in_array(strtolower($extension), $this->accept[$fileMime]))
         {
             $newFileName = md5(time() . rand()) . "." . $extension;
-            $file        = $file->move($this->storeFolder, $newFileName);
+            $file        = $file->move($this->storePath.$this->storeDirectory, $newFileName);
         }
         else
         {
@@ -138,7 +170,7 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
 
             $media->setNameOriginal($oldName);
             $media->setName($file->getFilename());
-            $media->setSrc('/media/' . $file->getFilename());
+            $media->setSrc($this->storeDirectory.$file->getFilename());
             $media->setHash(sha1_file($file->getPathname()));
             $media->setUploader($this->user);
 
