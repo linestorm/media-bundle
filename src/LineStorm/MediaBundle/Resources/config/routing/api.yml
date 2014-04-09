@@ -1,4 +1,5 @@
 linestorm_cms_module_media_api_controller:
-    type:     rest
-    resource: LineStorm\MediaBundle\Controller\Api\MediaController
+    type:         rest
+    resource:     LineStorm\MediaBundle\Controller\Api\MediaController
     name_prefix:  linestorm_cms_module_media_api_
+    prefix:       /api

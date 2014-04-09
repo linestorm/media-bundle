@@ -6,6 +6,8 @@ use LineStorm\MediaBundle\Form\DataTransformer\MediaEntityTransformer;
 use LineStorm\MediaBundle\Media\MediaManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
@@ -17,7 +19,12 @@ class MediaEntityType extends AbstractType
     /**
      * @var MediaManager
      */
-    protected  $mediaManager;
+    protected $mediaManager;
+
+    /**
+     * @var MediaEntityTransformer
+     */
+    protected $transformer;
 
     /**
      * @param MediaManager $mediaManager
@@ -25,6 +32,7 @@ class MediaEntityType extends AbstractType
     function __construct(MediaManager $mediaManager)
     {
         $this->mediaManager = $mediaManager;
+        $this->transformer = new MediaEntityTransformer($this->mediaManager);
     }
 
     /**
@@ -32,10 +40,15 @@ class MediaEntityType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $transformer = new MediaEntityTransformer($this->mediaManager);
-
-        $builder->addModelTransformer($transformer);
+        $builder->addModelTransformer($this->transformer);
     }
+
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $media = $this->transformer->reverseTransform($view->vars['value']);
+        $view->vars['media'] = $media;
+    }
+
 
     /**
      * {@inheritdoc}

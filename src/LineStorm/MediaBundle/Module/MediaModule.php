@@ -5,6 +5,7 @@ namespace LineStorm\MediaBundle\Module;
 use LineStorm\MediaBundle\Media\MediaManager;
 use LineStorm\CmsBundle\Module\AbstractModule;
 use LineStorm\CmsBundle\Module\ModuleInterface;
+use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -48,12 +49,18 @@ class MediaModule extends AbstractModule implements ModuleInterface
     }
 
     /**
-     * Add routes to the router
-     * @param LoaderInterface $loader
-     * @return RouteCollection
+     * @inheritdoc
      */
-    public function addRoutes(LoaderInterface $loader)
+    public function addRoutes(Loader $loader)
     {
-        return $loader->import('@LineStormMediaBundle/Resources/config/routing.yml', 'yaml');
+        return $loader->import('@LineStormMediaBundle/Resources/config/routing/api.yml', 'rest');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addAdminRoutes(Loader $loader)
+    {
+        return $loader->import('@LineStormMediaBundle/Resources/config/routing/admin.yml', 'yaml');
     }
 } 

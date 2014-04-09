@@ -62,22 +62,12 @@ $(document).ready(function(){
         $('#FormErrors').slideUp(function(){ $(this).html(''); });
         window.lineStorm.api.saveForm($form, function(on, status, xhr){
             if(xhr.status === 200){
-                alert('updated!');
             } else if(xhr.status === 201) {
-                alert('created!');
             } else {
-                alert('saved ('+xhr.status+')!');
             }
         }, function(e, status, ex){
             if(e.status === 400){
                 if(e.responseJSON){
-                    var errors = parseError(e.responseJSON.errors);
-                    var str = '';
-                    for(var i in errors){
-                        if(errors[i].length)
-                            str += "<p class=''><strong style='text-transform:capitalize;'>"+i+":</strong> "+errors[i].join(', ')+"</p>";
-                    }
-                    $('#FormErrors').html(str).slideDown();
                 } else {
                     alert(status);
                 }
