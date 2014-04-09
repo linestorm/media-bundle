@@ -6,7 +6,6 @@ services:
 
   linestorm.cms.module.media:
     class: %linestorm.cms.module.media.class%
-    arguments: [@linestorm.cms.media_manager]
     tags:
       - { name: linestorm.cms.module }
 

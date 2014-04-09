@@ -2,28 +2,18 @@
 
 namespace LineStorm\MediaBundle\Module;
 
-use LineStorm\MediaBundle\Media\MediaManager;
 use LineStorm\CmsBundle\Module\AbstractModule;
 use LineStorm\CmsBundle\Module\ModuleInterface;
 use Symfony\Component\Config\Loader\Loader;
-use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * Class MediaModule
+ * @package LineStorm\MediaBundle\Module
+ */
 class MediaModule extends AbstractModule implements ModuleInterface
 {
     protected $name = 'Media';
     protected $id = 'media';
-
-    /**
-     * @var MediaManager
-     */
-    protected $mediaManager;
-
-    function __construct(MediaManager $mediaManager)
-    {
-        $this->mediaManager = $mediaManager;
-    }
-
 
     /**
      * Returns the navigation array
