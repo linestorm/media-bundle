@@ -33,22 +33,19 @@
     {% endspaceless %}
 {% endmacro %}
 
+{% block head %}
+    {% block requirejs %}
+        {{
+            include('AndyPortfolioBundle::requirejs.html.twig', {
+                requirejs_module: ['/assets/bundles/linestormcms/js/main', '/assets/bundles/linestormmedia/js/media']
+            })
+        }}
+    {% endblock %}
+
+    <link rel="stylesheet" href="{{ asset(assetsPath ~ '/css/cms/media/media.css') }}" />
+{% endblock %}
+
 {% block module %}
-
-    {% stylesheets
-        'vendor/dropzone/downloads/css/dropzone.css'
-        '@LineStormMediaBundle/Resources/public/css/admin/media.css'
-        filter='cssrewrite' output='compiled/css/media.css' %}
-     <link rel="stylesheet" href="{{ asset_url }}" />
-    {% endstylesheets %}
-
-    {% javascripts
-        'vendor/dropzone/downloads/dropzone.min.js'
-        '@LineStormCmsBundle/Resources/public/js/api.js'
-        '@LineStormMediaBundle/Resources/public/js/admin/media.js'
-        output='compiled/js/media.js' %}
-        <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
 
     <div id="FormErrors" class="alert alert-danger" style="display: none;">
 

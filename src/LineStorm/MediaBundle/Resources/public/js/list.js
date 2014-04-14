@@ -1,5 +1,5 @@
 
-define(['jquery', 'bootstrap', '../../../bundles/linestormcms/js/api'], function ($, bs, api) {
+define(['jquery', '../../../../../../../../.', '/assets/bundles/linestormcms/js/api'], function ($, bs, api) {
     var page = 1,
         $container;
 

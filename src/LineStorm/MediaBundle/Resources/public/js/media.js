@@ -1,5 +1,5 @@
 
-define(['jquery', 'bootstrap', 'dropzone', '../../../bundles/linestormcms/js/api'], function ($, bs, Dropzone, api) {
+define(['jquery', 'bootstrap', 'dropzone', '/assets/bundles/linestormcms/js/api'], function ($, bs, Dropzone, api) {
 
     // setup dropzone
     Dropzone.autoDiscover = false;
