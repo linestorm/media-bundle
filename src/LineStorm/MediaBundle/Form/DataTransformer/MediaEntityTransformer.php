@@ -8,6 +8,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 /**
  * Class MediaEntityTransformer
+ *
  * @package LineStorm\MediaBundle\Form\DataTransformer
  */
 class MediaEntityTransformer implements DataTransformerInterface
@@ -29,10 +30,14 @@ class MediaEntityTransformer implements DataTransformerInterface
 
     /**
      * Transforms the Document's value to a value for the form field
+     *
+     * @param mixed $data
+     *
+     * @return int|null
      */
     public function transform($data)
     {
-        if($data instanceof Media)
+        if ($data instanceof Media)
         {
             return $data->getId();
         }
@@ -42,18 +47,22 @@ class MediaEntityTransformer implements DataTransformerInterface
 
     /**
      * Transforms the value the users has typed to a value that suits the field in the Document
+     *
+     * @param mixed $data
+     *
+     * @return Media|null
      */
     public function reverseTransform($data)
     {
-        if(!is_numeric($data))
+        if (!is_numeric($data))
         {
             return null;
         }
 
         $defaultProvider = $this->mediaManager->getDefaultProviderInstance();
-        $fetched = $defaultProvider->find($data);
+        $fetched         = $defaultProvider->find($data);
 
-        if($fetched instanceof Media)
+        if ($fetched instanceof Media)
         {
             return $fetched;
         }

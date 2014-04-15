@@ -16,59 +16,22 @@
     {% endspaceless %}
 {% endmacro %}
 
+{% block head %}
+    {% block requirejs %}
+        {{
+            include('AndyPortfolioBundle::requirejs.html.twig', {
+                requirejs_module: ['cms_main', 'cms_media_list']
+            })
+        }}
+    {% endblock %}
+{% endblock %}
+
 {% block module %}
-    <script type="text/javascript">
-        var page = 1,
-            $container;
-
-        function requestPage(){
-            $.ajax({
-                url: "{{ path('linestorm_cms_module_media_api_get_media_all') }}",
-                data: {
-                    page: page,
-                    limit: 50
-                },
-                type: 'GET',
-                dataType: 'json',
-                success: function(o){
-                    $container.empty();
-                    var html = '';
-                    for(var i in o){
-                        var media = o[i];
-                        var prototype = $container.data('prototype');
-                        for(var p in media){
-                            var prop = media[p];
-                            var rgx = new RegExp("__"+p+"__", "gim");
-                            prototype = prototype.replace(rgx, prop);
-                        }
-                        html += prototype;
-                    }
-
-                    $container.append(html);
-                }
-            });
-        };
-        $(document).ready(function(){
-            $container = $('.media-container');
-
-            $('a.media-prev').on('click', function(){
-                if(page <= 0)
-                    return;
-                --page;
-                requestPage();
-            });
-            $('a.media-next').on('click', function(){
-                ++page;
-                requestPage();
-            });
-            requestPage();
-        });
-    </script>
     <ul class="pager pull-left">
         <li><a class="media-prev" href="#">Previous</a></li>
         <li><a class="media-next" href="#">Next</a></li>
     </ul>
-    <div class="row media-container" data-prototype="{{ fn.imageItem()|e('html_attr') }}">
+    <div class="row media-container" data-prototype="{{ fn.imageItem()|e('html_attr') }}" data-url="{{ path('linestorm_cms_module_media_api_get_media_all') }}">
 
     </div>
     <ul class="pager pull-left">

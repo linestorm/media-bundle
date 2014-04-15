@@ -2,18 +2,34 @@
 
 namespace LineStorm\MediaBundle\Media\Exception;
 
+use LineStorm\MediaBundle\Model\Media;
+
+/**
+ * Class MediaFileAlreadyExistsException
+ *
+ * @package LineStorm\MediaBundle\Media\Exception
+ */
 class MediaFileAlreadyExistsException extends \Exception
 {
+    /**
+     * @var Media|null
+     */
     private $entity;
 
-    function __construct($entity, $message='The media file is already uploaded')
+    /**
+     * @param string $entity
+     * @param string $message
+     */
+    function __construct($entity, $message = 'The media file is already uploaded')
     {
         $this->entity = $entity;
         parent::__construct($message);
     }
 
     /**
-     * @return string
+     * get the entity that already existed
+     *
+     * @return Media|null
      */
     public function getEntity()
     {

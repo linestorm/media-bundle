@@ -5,6 +5,11 @@ namespace LineStorm\MediaBundle\Media;
 use LineStorm\MediaBundle\Model\Media;
 use Symfony\Component\HttpFoundation\File\File;
 
+/**
+ * Class MediaManager
+ *
+ * @package LineStorm\MediaBundle\Media
+ */
 class MediaManager implements \Countable
 {
     /**
@@ -14,21 +19,41 @@ class MediaManager implements \Countable
 
     private $defaultProvider = null;
 
+    /**
+     * Get the total number of media providers
+     *
+     * @return int
+     */
     public function count()
     {
         return count($this->mediaProviders);
     }
 
+    /**
+     * Get all the media providers
+     *
+     * @return MediaProviderInterface[]
+     */
     public function getMediaProviders()
     {
         return $this->mediaProviders;
     }
 
+    /**
+     * Add a media provider to the stack
+     *
+     * @param MediaProviderInterface $mediaProvider
+     */
     public function addMediaProvider(MediaProviderInterface $mediaProvider)
     {
         $this->mediaProviders[$mediaProvider->getId()] = $mediaProvider;
     }
 
+    /**
+     * Set the default media provider by Id
+     *
+     * @param string $provider
+     */
     public function setDefaultProvider($provider)
     {
         $this->defaultProvider = $provider;
@@ -88,8 +113,8 @@ class MediaManager implements \Countable
     /**
      * Store the file into the bank
      *
-     * @param File $file
-     * @param \LineStorm\CmsBundle\Model\Media $media
+     * @param File   $file
+     * @param Media  $media
      * @param string $provider
      *
      * @return Media
@@ -106,6 +131,14 @@ class MediaManager implements \Countable
         }
     }
 
+    /**
+     * Update a media model
+     *
+     * @param Media $media
+     * @param null  $provider
+     *
+     * @return Media
+     */
     public function update(Media $media, $provider=null)
     {
         if($provider && array_key_exists($provider, $this->mediaProviders))
@@ -115,6 +148,27 @@ class MediaManager implements \Countable
         else
         {
             return $this->mediaProviders[$this->defaultProvider]->update($media);
+        }
+    }
+
+
+    /**
+     * Delete a media model
+     *
+     * @param Media $media
+     * @param null  $provider
+     *
+     * @return Media
+     */
+    public function delete(Media $media, $provider=null)
+    {
+        if($provider && array_key_exists($provider, $this->mediaProviders))
+        {
+            $this->mediaProviders[$provider]->delete($media);
+        }
+        else
+        {
+            $this->mediaProviders[$this->defaultProvider]->delete($media);
         }
     }
 }

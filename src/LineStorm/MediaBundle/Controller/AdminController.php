@@ -6,17 +6,31 @@ use FOS\RestBundle\View\View;
 use LineStorm\MediaBundle\Media\Exception\MediaFileAlreadyExistsException;
 use LineStorm\MediaBundle\Model\Media;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Class AdminController
+ *
+ * @package LineStorm\MediaBundle\Controller
+ */
 class AdminController extends Controller
 {
 
+    /**
+     * List all media items
+     *
+     * @return Response
+     * @throws AccessDeniedException
+     */
     public function listAction()
     {
         $user = $this->getUser();
-        if (!($user instanceof UserInterface) || !($user->hasGroup('admin'))) {
+        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        {
             throw new AccessDeniedException();
         }
 
@@ -30,16 +44,24 @@ class AdminController extends Controller
 
     }
 
-
+    /**
+     * Edit a media entity
+     *
+     * @param $id
+     *
+     * @return Response
+     * @throws AccessDeniedException
+     */
     public function editAction($id)
     {
         $user = $this->getUser();
-        if (!($user instanceof UserInterface) || !($user->hasGroup('admin'))) {
+        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        {
             throw new AccessDeniedException();
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
-        $provider = $mediaManager->getDefaultProviderInstance();
+        $provider     = $mediaManager->getDefaultProviderInstance();
 
         $media = $mediaManager->find($id);
 
@@ -49,21 +71,27 @@ class AdminController extends Controller
         ));
 
         return $this->render('LineStormMediaBundle:Admin:edit.html.twig', array(
-            'image'     => $media,
-            'form'      => $form->createView(),
+            'image' => $media,
+            'form'  => $form->createView(),
         ));
     }
 
-
+    /**
+     * Create a media entity
+     *
+     * @return Response
+     * @throws AccessDeniedException
+     */
     public function newAction()
     {
         $user = $this->getUser();
-        if (!($user instanceof UserInterface) || !($user->hasGroup('admin'))) {
+        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        {
             throw new AccessDeniedException();
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
-        $provider = $mediaManager->getDefaultProviderInstance();
+        $provider     = $mediaManager->getDefaultProviderInstance();
 
         $form = $this->createForm($provider->getForm(), null, array(
             'action' => $this->generateUrl('linestorm_cms_module_media_api_post_media'),
@@ -76,11 +104,17 @@ class AdminController extends Controller
         ));
     }
 
-
+    /**
+     * Upload a media entity
+     *
+     * @return Response
+     * @throws AccessDeniedException
+     */
     public function uploadAction()
     {
         $user = $this->getUser();
-        if (!($user instanceof UserInterface) || !($user->hasGroup('admin'))) {
+        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        {
             throw new AccessDeniedException();
         }
 
@@ -89,37 +123,48 @@ class AdminController extends Controller
         try
         {
             $media = $this->doUpload();
-        }
-        catch(MediaFileAlreadyExistsException $e)
+        } catch (MediaFileAlreadyExistsException $e)
         {
             $media = $e->getEntity();
-            $code = 200;
-        }
-        catch(\Exception $e)
+            $code  = 200;
+        } catch (\Exception $e)
         {
             $view = View::create(array(
-                'error'=> $e->getMessage(),
+                'error' => $e->getMessage(),
             ), 400);
             $view->setFormat('json');
+
             return $this->get('fos_rest.view_handler')->handle($view);
         }
 
         $view = View::create(new \LineStorm\MediaBundle\Document\Media($media), $code);
         $view->setFormat('json');
+
         return $this->get('fos_rest.view_handler')->handle($view);
     }
 
+    /**
+     * Upload an item for a entity we are editing
+     *
+     * @param $id
+     *
+     * @return Response
+     * @throws AccessDeniedException
+     * @throws HttpException
+     * @throws NotFoundHttpException
+     */
     public function uploadEditAction($id)
     {
         $user = $this->getUser();
-        if (!($user instanceof UserInterface) || !($user->hasGroup('admin'))) {
+        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        {
             throw new AccessDeniedException();
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
-        $image = $mediaManager->find($id);
+        $image        = $mediaManager->find($id);
 
-        if(!($image instanceof Media))
+        if (!($image instanceof Media))
         {
             throw $this->createNotFoundException("Image Not Found");
         }
@@ -128,24 +173,23 @@ class AdminController extends Controller
         try
         {
             $image = $this->doUpload($image);
-        }
-        catch(MediaFileAlreadyExistsException $e)
+        } catch (MediaFileAlreadyExistsException $e)
         {
             $code = 200;
-        }
-        catch(HttpException $e)
+        } catch (HttpException $e)
         {
             $view = View::create($e);
             $view->setFormat('json');
+
             return $this->get('fos_rest.view_handler')->handle($view);
-        }
-        catch(\Exception $e)
+        } catch (\Exception $e)
         {
             throw new HttpException(400, 'Upload Invalid', $e);
         }
 
         $view = View::create(new \LineStorm\MediaBundle\Document\Media($image), $code);
         $view->setFormat('json');
+
         return $this->get('fos_rest.view_handler')->handle($view);
     }
 
@@ -156,23 +200,24 @@ class AdminController extends Controller
      * @param Media|null $entity The entity to store into
      *
      * @return Media
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws HttpException
      */
     private function doUpload($entity = null)
     {
         $mediaManager = $this->get('linestorm.cms.media_manager');
 
         $request = $this->getRequest();
-        $files = $request->files->all();
+        $files   = $request->files->all();
 
         $totalFiles = count($files);
 
         // only allow single uploads
-        if($totalFiles === 1) {
+        if ($totalFiles === 1)
+        {
             /* @var $file \Symfony\Component\HttpFoundation\File\UploadedFile */
             $file = array_shift($files);
 
-            if($file->isValid())
+            if ($file->isValid())
             {
                 $media = $mediaManager->store($file, $entity);
                 if (!($media instanceof Media))
@@ -184,7 +229,7 @@ class AdminController extends Controller
             }
             else
             {
-                switch($file->getError())
+                switch ($file->getError())
                 {
                     case UPLOAD_ERR_INI_SIZE:
                         throw new HttpException(400, 'Upload Invalid: File too large for server');

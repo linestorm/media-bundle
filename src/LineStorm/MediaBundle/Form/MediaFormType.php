@@ -8,6 +8,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+/**
+ * Class MediaFormType
+ *
+ * @package LineStorm\MediaBundle\Form
+ */
 class MediaFormType extends AbstractType
 {
 
@@ -18,6 +23,9 @@ class MediaFormType extends AbstractType
      */
     protected $mediaManager;
 
+    /**
+     * @param MediaManager $mediaManager
+     */
     function __construct(MediaManager $mediaManager)
     {
         $this->mediaManager = $mediaManager;

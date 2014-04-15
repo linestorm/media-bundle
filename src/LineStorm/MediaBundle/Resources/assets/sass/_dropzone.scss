@@ -1,0 +1,56 @@
+@import "/assets/vendor/dropzone/downloads/css/dropzone.css";
+
+.dropzone {
+  overflow: hidden;
+
+  .dz-default.dz-message {
+    height: 60px;
+    margin-top: -21.5px;
+    background-image: none;
+  }
+
+  .dz-preview {
+    margin-bottom: 10px;
+    display: block;
+
+    .panel-left {
+      width: 100px;
+      float: left;
+    }
+    .dz-image {
+      height: 100px;
+      width: 100px;
+    }
+    .dz-remove {
+      max-width: 100px;
+      cursor: pointer;
+    }
+    .dz-details {
+      width: calc(100% - 120px);
+      float: right;
+      height: 100%;
+      background: transparent;
+    }
+    .dz-progress {
+      height: 5px;
+      margin-bottom: 10px;
+      position: relative !important;top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      > span {
+        height: 5px;
+        display: block;
+        background-color: #5cb85c;
+      }
+      .dz-upload {
+        position: relative;
+        top: 0;
+        left: 0;
+        right: 0;
+      }
+    }
+  }
+
+}

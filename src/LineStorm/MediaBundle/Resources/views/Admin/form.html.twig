@@ -33,22 +33,25 @@
     {% endspaceless %}
 {% endmacro %}
 
-{% block module %}
+{% block head %}
+    {% block requirejs %}
+        {{
+            include('AndyPortfolioBundle::requirejs.html.twig', {
+                requirejs_module: ['cms_main', 'cms_media']
+            })
+        }}
+    {% endblock %}
+
 
     {% stylesheets
-        'vendor/dropzone/downloads/css/dropzone.css'
-        '@LineStormMediaBundle/Resources/public/css/admin/media.css'
-        filter='cssrewrite' output='compiled/css/media.css' %}
-     <link rel="stylesheet" href="{{ asset_url }}" />
+        filter="compass" output="assets/bundles/linestormmedia/css/media.css"
+        "@LineStormMediaBundle/Resources/assets/sass/media.scss"
+    %}
+        <link rel="stylesheet" href="{{ asset_url }}" />
     {% endstylesheets %}
+{% endblock %}
 
-    {% javascripts
-        'vendor/dropzone/downloads/dropzone.min.js'
-        '@LineStormCmsBundle/Resources/public/js/api.js'
-        '@LineStormMediaBundle/Resources/public/js/admin/media.js'
-        output='compiled/js/media.js' %}
-        <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
+{% block module %}
 
     <div id="FormErrors" class="alert alert-danger" style="display: none;">
 
@@ -78,7 +81,9 @@
 
             <div class="form-group">
                 <div class="col-sm-12">
-                    <button type="submit" class="btn btn-default post-save">Save</button>
+                    <button type="submit" class="btn btn-default post-save"><i class="fa-save"></i> Save</button>
+                    {% block media_form_buttons %}
+                    {% endblock %}
                 </div>
             </div>
         </div>
