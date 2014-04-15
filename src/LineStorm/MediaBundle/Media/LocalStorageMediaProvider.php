@@ -90,6 +90,11 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
         }
     }
 
+    /**
+     * Return the entity class FQNS
+     *
+     * @return string
+     */
     public function getEntityClass()
     {
         return $this->class;
@@ -168,11 +173,16 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
                 $media->setTitle($oldName);
             }
 
+            $oldPath = pathinfo($oldName);
+
             $media->setNameOriginal($oldName);
             $media->setName($file->getFilename());
+            $media->setDescription('Uploaded by '.$this->user->getUsername());
             $media->setSrc($this->storeDirectory.$file->getFilename());
             $media->setHash(sha1_file($file->getPathname()));
             $media->setUploader($this->user);
+            $media->setAlt($oldPath['filename']);
+            $media->setCredits($this->user->getUsername());
 
             $this->em->persist($media);
             $this->em->flush($media);
@@ -188,6 +198,21 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     {
         $this->em->persist($media);
         $this->em->flush($media);
+
+        return $media;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function delete(Media $media)
+    {
+        $file = $this->storePath.$media->getSrc();
+        if($media->getSrc() && file_exists($file) && is_file($file))
+            unlink($file);
+        $this->em->remove($media);
+        $this->em->flush();
+    }
+
 
 } 

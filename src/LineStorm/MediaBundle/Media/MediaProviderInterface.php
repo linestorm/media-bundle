@@ -62,7 +62,7 @@ interface MediaProviderInterface
      * @param File  $file
      * @param Media $media
      *
-     * @return mixed
+     * @return Media
      */
     public function store(File $file, Media $media = null);
 
@@ -71,7 +71,16 @@ interface MediaProviderInterface
      *
      * @param Media $media
      *
-     * @return mixed
+     * @return Media
      */
     public function update(Media $media);
+
+    /**
+     * Delete an image in storage
+     *
+     * @param Media $media
+     *
+     * @return void
+     */
+    public function delete(Media $media);
 } 

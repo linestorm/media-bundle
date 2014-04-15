@@ -1,5 +1,5 @@
 
-define(['jquery', 'bootstrap', 'dropzone', '/assets/bundles/linestormcms/js/api'], function ($, bs, Dropzone, api) {
+define(['jquery', 'bootstrap', 'dropzone', 'cms_api'], function ($, bs, Dropzone, api) {
 
     // setup dropzone
     Dropzone.autoDiscover = false;
@@ -58,6 +58,18 @@ define(['jquery', 'bootstrap', 'dropzone', '/assets/bundles/linestormcms/js/api'
             });
 
             return false;
+        });
+
+        $('.media-form-delete').on('click', function(){
+            if(confirm("Are you sure you want to permanently delete this media?\n\nWARNING: IF IT IS USED ANYWHERE, IT WILL CREATE 404 RESPONSES")){
+                window.lineStorm.api.call($(this).data('url'), {
+                    type: 'DELETE',
+                    success: function(o){
+                        alert(o.message);
+                        window.location = o.location;
+                    }
+                })
+            }
         });
     });
 

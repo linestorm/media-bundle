@@ -4,6 +4,7 @@ namespace LineStorm\MediaBundle\Media\Exception;
 
 /**
  * Class MediaFileDeniedException
+ *
  * @package LineStorm\MediaBundle\Media\Exception
  */
 class MediaFileDeniedException extends \Exception

@@ -2,7 +2,11 @@
 
 namespace LineStorm\MediaBundle\Document;
 
-
+/**
+ * Class Media
+ *
+ * @package LineStorm\MediaBundle\Document
+ */
 class Media
 {
     /**
@@ -55,6 +59,9 @@ class Media
      */
     protected $seo;
 
+    /**
+     * @param \LineStorm\MediaBundle\Model\Media $media
+     */
     function __construct(\LineStorm\MediaBundle\Model\Media $media)
     {
         $this->alt          = $media->getAlt();

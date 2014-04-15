@@ -43,12 +43,15 @@ class MediaEntityType extends AbstractType
         $builder->addModelTransformer($this->transformer);
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $media = $this->transformer->reverseTransform($view->vars['value']);
         $view->vars['media'] = $media;
     }
-
 
     /**
      * {@inheritdoc}

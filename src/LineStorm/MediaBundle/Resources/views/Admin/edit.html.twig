@@ -2,3 +2,10 @@
 
 {% block page_title %}Edit Media{% endblock %}
 {% block page_desc %}{% endblock %}
+
+{% block media_form_buttons %}
+    <button type="button" class="btn btn-danger media-form-delete" data-url="{{ path
+    ('linestorm_cms_module_media_api_delete_media', {id: image.id}) }}">
+        <i class="fa-trash-o"></i> Delete
+    </button>
+{% endblock %}

@@ -37,7 +37,7 @@
     {% block requirejs %}
         {{
             include('AndyPortfolioBundle::requirejs.html.twig', {
-                requirejs_module: ['/assets/bundles/linestormcms/js/main', '/assets/bundles/linestormmedia/js/media']
+                requirejs_module: ['cms_main', 'cms_media']
             })
         }}
     {% endblock %}
@@ -81,7 +81,9 @@
 
             <div class="form-group">
                 <div class="col-sm-12">
-                    <button type="submit" class="btn btn-default post-save">Save</button>
+                    <button type="submit" class="btn btn-default post-save"><i class="fa-save"></i> Save</button>
+                    {% block media_form_buttons %}
+                    {% endblock %}
                 </div>
             </div>
         </div>

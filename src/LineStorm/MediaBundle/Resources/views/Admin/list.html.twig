@@ -20,8 +20,7 @@
     {% block requirejs %}
         {{
             include('AndyPortfolioBundle::requirejs.html.twig', {
-                requirejs_module: ['/assets/bundles/linestormcms/js/main',
-        '/assets/bundles/linestormmedia/js/list']
+                requirejs_module: ['cms_main', 'cms_media_list']
             })
         }}
     {% endblock %}
