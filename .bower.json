@@ -1,0 +1,24 @@
+{
+  "name": "linestorm-media-bundle",
+  "description": "LineStorm CMS Media Bundle Assets",
+  "version": "1.0.0",
+  "authors": [
+    "Andy Thorne <contrabandvr@gmail.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "bootstrap": ">= 3.0.0",
+    "dropzone": ">= 3.8.0",
+    "requirejs": "~2.1.11",
+    "requirejs-domready": "~2.0.1",
+    "sass-bootstrap": "~3.0.2"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

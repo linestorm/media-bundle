@@ -12,6 +12,7 @@ This module will provide functionality to post blog type content to the LineStor
 2. Enable the Bundle
 3. Configure the Bundle
 4. Installing Assets
+5. Configuring Assets
 
 Step 1: Download bundle using composer
 --------------------------------------
@@ -21,8 +22,6 @@ Add `linestorm/media-bundle` to your `composer.json` file, or download it by run
 ```bash
 $ php composer.phar require linestorm/media-bundle
 ```
-
-Composer will install the bundle to your project's vendor/ directory.
 
 Step 2: Enable the bundle
 -------------------------
@@ -69,12 +68,34 @@ services:
             - { name: linestorm.cms.media_provider }
 ```
 
-See [Creating a media provder](src/LineStorm/MediaBundle/Resources/doc/media_provider.md) for creating your own provider.
+See [Creating a media provder](docs/media_provider.md) for creating your own
+provider.
 
 
 Step 4: Installing Assets
 -------------------------
 
-If you use bower, add the dependencies within bower.json. If you do not, you will need to add them manually into
-web/vendor.
+###Bower
+Add [.bower.json](.bower.json) to the dependencies
 
+###Manual
+Download the modules in [.bower.json](.bower.json) to your assets folder
+
+
+
+Step 5: Configuring Assets
+-------------------------
+
+You will need to add these dependency paths to your requirejs config:
+
+```js
+requirejs.config({
+    paths: {
+        // ...
+
+        // cms media library
+        cms_media:          '/path/to/bundles/linestormmedia/js/media',
+        cms_media_list:     '/path/to/bundles/linestormmedia/js/list'
+    }
+});
+```
