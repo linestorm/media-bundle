@@ -29,7 +29,7 @@ define(['jquery', 'bootstrap', 'cms_api'], function ($, bs, api) {
                 $container.append(html);
             }
         });
-    };
+    }
 
     $(document).ready(function(){
         $container = $('.media-container');

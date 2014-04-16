@@ -68,7 +68,7 @@ define(['jquery', 'bootstrap', 'dropzone', 'cms_api'], function ($, bs, Dropzone
                         alert(o.message);
                         window.location = o.location;
                     }
-                })
+                });
             }
         });
     });
