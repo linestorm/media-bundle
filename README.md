@@ -1,6 +1,8 @@
 Post Module for LineStorm Blog Bundle
 ========================================
 
+[![Build Status](https://travis-ci.org/linestorm/media-bundle.svg?branch=master)](https://travis-ci.org/linestorm/media-bundle)
+
 Post Module for the LineStorm BlogBundle. It comes bundled with the Tag, Article and Gallery components. It also requires
 the `linestorm/media-bundle`.
 
