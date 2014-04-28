@@ -70,20 +70,21 @@ class MediaManager implements \Countable
     /**
      * Search the media providers for
      *
-     * @param string $id Image identifier
+     * @param string $id       Image identifier
      * @param string $provider Provider Identifier
      *
      * @return null
      */
-    public function find($id, $provider=null)
+    public function find($id, $provider = null)
     {
-        if($provider && array_key_exists($provider, $this->mediaProviders))
+        if ($provider && array_key_exists($provider, $this->mediaProviders))
         {
             return $this->mediaProviders[$provider]->find($id);
         }
         else
         {
             $provider = $this->getDefaultProviderInstance();
+
             return $provider->find($id);
         }
     }
@@ -91,22 +92,45 @@ class MediaManager implements \Countable
     /**
      * Search the media providers for
      *
-     * @param array $terms
+     * @param array  $terms
      * @param string $provider Provider Identifier
      *
      * @internal param string $id Image identifier
      * @return null
      */
-    public function findBy(array $terms, $provider=null)
+    public function findBy(array $terms, $provider = null)
     {
-        if($provider && array_key_exists($provider, $this->mediaProviders))
+        if ($provider && array_key_exists($provider, $this->mediaProviders))
         {
             return $this->mediaProviders[$provider]->findBy($terms);
         }
         else
         {
             $provider = $this->getDefaultProviderInstance();
+
             return $provider->findBy($terms);
+        }
+    }
+
+    /**
+     * Search for media by text
+     *
+     * @param string $query
+     * @param null   $provider
+     *
+     * @return mixed
+     */
+    public function search($query, $provider = null)
+    {
+        if ($provider && array_key_exists($provider, $this->mediaProviders))
+        {
+            return $this->mediaProviders[$provider]->searchBy($query);
+        }
+        else
+        {
+            $provider = $this->getDefaultProviderInstance();
+
+            return $provider->search($query);
         }
     }
 
@@ -119,9 +143,9 @@ class MediaManager implements \Countable
      *
      * @return Media
      */
-    public function store(File $file, Media $media=null, $provider=null)
+    public function store(File $file, Media $media = null, $provider = null)
     {
-        if($provider && array_key_exists($provider, $this->mediaProviders))
+        if ($provider && array_key_exists($provider, $this->mediaProviders))
         {
             return $this->mediaProviders[$provider]->store($file, $media);
         }
@@ -139,9 +163,9 @@ class MediaManager implements \Countable
      *
      * @return Media
      */
-    public function update(Media $media, $provider=null)
+    public function update(Media $media, $provider = null)
     {
-        if($provider && array_key_exists($provider, $this->mediaProviders))
+        if ($provider && array_key_exists($provider, $this->mediaProviders))
         {
             return $this->mediaProviders[$provider]->update($media);
         }
@@ -160,9 +184,9 @@ class MediaManager implements \Countable
      *
      * @return Media
      */
-    public function delete(Media $media, $provider=null)
+    public function delete(Media $media, $provider = null)
     {
-        if($provider && array_key_exists($provider, $this->mediaProviders))
+        if ($provider && array_key_exists($provider, $this->mediaProviders))
         {
             $this->mediaProviders[$provider]->delete($media);
         }

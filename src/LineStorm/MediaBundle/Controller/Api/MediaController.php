@@ -92,6 +92,33 @@ class MediaController extends AbstractApiController implements ClassResourceInte
     }
 
     /**
+     * Search for a media entity
+     *
+     * @return Response
+     * @throws AccessDeniedException
+     * @throws NotFoundHttpException
+     *
+     * [GET] /api/media/search/?q={query}
+     */
+    public function searchAction()
+    {
+        $user = $this->getUser();
+        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        {
+            throw new AccessDeniedException();
+        }
+
+        $mediaManager = $this->get('linestorm.cms.media_manager');
+        $provider = $this->getRequest()->query->get('p', null);
+
+        $query = $this->getRequest()->query->get('q', null);
+        $images = $mediaManager->search($query, $provider);
+
+        $view = View::create($images);
+        return $this->get('fos_rest.view_handler')->handle($view);
+    }
+
+    /**
      * Create a new media entity
      *
      * @return Response

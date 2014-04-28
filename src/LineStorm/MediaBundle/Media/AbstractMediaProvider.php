@@ -1,6 +1,7 @@
 <?php
 
 namespace LineStorm\MediaBundle\Media;
+use LineStorm\SearchBundle\Search\SearchProviderInterface;
 
 /**
  * Class AbstractMediaProvider
@@ -23,6 +24,11 @@ abstract class AbstractMediaProvider
     protected $form;
 
     /**
+     * @var SearchProviderInterface
+     */
+    protected $searchProvider;
+
+    /**
      * @inheritdoc
      */
     public function getId()
@@ -36,5 +42,13 @@ abstract class AbstractMediaProvider
     public function getForm()
     {
         return $this->form;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSearchProvider(SearchProviderInterface $searchProvider)
+    {
+        $this->searchProvider = $searchProvider;
     }
 } 

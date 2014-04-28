@@ -2,12 +2,19 @@ parameters:
   linestorm.cms.module.media.class:            LineStorm\MediaBundle\Module\MediaModule
   linestorm.cms.module.media.manager.class:    LineStorm\MediaBundle\Media\MediaManager
 
+  linestorm.cms.module.media.search_provider.class: LineStorm\MediaBundle\Search\MediaTriGraphSearchProvider
+
 services:
 
   linestorm.cms.module.media:
     class: %linestorm.cms.module.media.class%
     tags:
       - { name: linestorm.cms.module }
+
+  linestorm.cms.module.media.search_provider:
+    class: %linestorm.cms.module.media.search_provider.class%
+    tags:
+      - { name: linestorm.cms.module.search.provider, map: media }
 
   #
   # MEDIA MANAGER

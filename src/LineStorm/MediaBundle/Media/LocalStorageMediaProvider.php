@@ -3,6 +3,7 @@
 namespace LineStorm\MediaBundle\Media;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query;
 use LineStorm\MediaBundle\Media\Exception\MediaFileAlreadyExistsException;
 use LineStorm\MediaBundle\Media\Exception\MediaFileDeniedException;
 use LineStorm\MediaBundle\Model\Media;
@@ -124,6 +125,14 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
         $repo = $this->em->getRepository($this->class);
 
         return $repo->findBy($criteria, $order, $limit, $offset);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function search($query)
+    {
+        return $this->searchProvider->search($query, Query::HYDRATE_ARRAY);
     }
 
     /**

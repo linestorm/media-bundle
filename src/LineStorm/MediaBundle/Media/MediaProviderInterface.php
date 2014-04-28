@@ -3,6 +3,7 @@
 namespace LineStorm\MediaBundle\Media;
 
 use LineStorm\MediaBundle\Model\Media;
+use LineStorm\SearchBundle\Search\SearchProviderInterface;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
@@ -83,4 +84,22 @@ interface MediaProviderInterface
      * @return void
      */
     public function delete(Media $media);
+
+    /**
+     * Set the search provider
+     *
+     * @param SearchProviderInterface $searchProvider
+     *
+     * @return void
+     */
+    public function setSearchProvider(SearchProviderInterface $searchProvider);
+
+    /**
+     * Search for media by text
+     *
+     * @param $query
+     *
+     * @return mixed
+     */
+    public function search($query);
 } 
