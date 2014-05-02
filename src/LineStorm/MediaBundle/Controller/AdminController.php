@@ -137,7 +137,11 @@ class AdminController extends Controller
             return $this->get('fos_rest.view_handler')->handle($view);
         }
 
-        $view = View::create(new \LineStorm\MediaBundle\Document\Media($media), $code);
+        $api = array(
+            'edit' => $this->generateUrl('linestorm_cms_module_media_api_put_media', array('id' => $media->getId())),
+        );
+        $doc = new \LineStorm\MediaBundle\Document\Media($media, $api);
+        $view = View::create($doc, $code);
         $view->setFormat('json');
 
         return $this->get('fos_rest.view_handler')->handle($view);

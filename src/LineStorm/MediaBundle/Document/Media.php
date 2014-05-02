@@ -60,9 +60,15 @@ class Media
     protected $seo;
 
     /**
-     * @param \LineStorm\MediaBundle\Model\Media $media
+     * @var array Array of all api urls
      */
-    function __construct(\LineStorm\MediaBundle\Model\Media $media)
+    protected $_api;
+
+    /**
+     * @param \LineStorm\MediaBundle\Model\Media $media
+     * @param array                              $api
+     */
+    function __construct(\LineStorm\MediaBundle\Model\Media $media, array $api = array())
     {
         $this->alt          = $media->getAlt();
         $this->credits      = $media->getCredits();
@@ -74,6 +80,8 @@ class Media
         $this->seo          = $media->getSeo();
         $this->src          = $media->getSrc();
         $this->title        = $media->getTitle();
+
+        $this->_api         = $api;
     }
 
     /**
@@ -156,6 +164,12 @@ class Media
         return $this->title;
     }
 
-
+    /**
+     * @return array
+     */
+    public function getApi()
+    {
+        return $this->_api;
+    }
 
 } 
