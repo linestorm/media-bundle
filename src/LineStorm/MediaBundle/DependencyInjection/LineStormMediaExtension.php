@@ -27,5 +27,6 @@ class LineStormMediaExtension extends Extension
         $loader->load('services-form-types.yml');
 
         $container->setParameter('linestorm.cms.media_provider.default', $config['default_provider']);
+        $container->setParameter('linestorm.cms.media.image_resize_config', $config['image_resize']);
     }
 }

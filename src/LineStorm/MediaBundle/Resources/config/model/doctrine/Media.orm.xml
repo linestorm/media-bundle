@@ -12,7 +12,7 @@
     <field name="description" type="string" length="255" column="description" precision="0" scale="0" nullable="true"/>
 
     <field name="src" type="string" length="255" column="src" precision="0" scale="0" nullable="false"/>
-    <field name="seo" type="string" length="100" column="seo" precision="0" scale="0" nullable="true"/>
+    <field name="path" type="string" length="255" column="path" precision="0" scale="0" nullable="false"/>
 
   </mapped-superclass>
 </doctrine-mapping>

@@ -24,6 +24,12 @@ class Configuration implements ConfigurationInterface
             ->isRequired()
             ->children()
                 ->scalarNode('default_provider')->defaultValue('local_storage')->end()
+                ->arrayNode('image_resize')
+                    ->prototype('array')
+                        ->prototype('scalar')
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ;
         // Here you should define the parameters that are allowed to

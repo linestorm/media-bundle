@@ -2,6 +2,7 @@
 
 namespace LineStorm\MediaBundle\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use JMS\Serializer\Annotation as JMS;
@@ -61,12 +62,30 @@ class Media
     /**
      * @var string
      */
-    protected $seo;
+    protected $path;
 
     /**
      * @var UserInterface
      */
     protected $uploader;
+
+    /**
+     * @var Media
+     */
+    protected $parent;
+
+    /**
+     * @var Media[]
+     */
+    protected $children;
+
+    /**
+     *
+     */
+    function __construct()
+    {
+        $this->children = new ArrayCollection();
+    }
 
     /**
      * @return int
@@ -190,22 +209,6 @@ class Media
     }
 
     /**
-     * @param string $seo
-     */
-    public function setSeo($seo)
-    {
-        $this->seo = $seo;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSeo()
-    {
-        return $this->seo;
-    }
-
-    /**
      * @param string $src
      */
     public function setSrc($src)
@@ -220,8 +223,6 @@ class Media
     {
         return $this->src;
     }
-
-
 
     /**
      * @param UserInterface $uploader
@@ -239,6 +240,60 @@ class Media
         return $this->uploader;
     }
 
-    
-    
+    /**
+     * @param string $path
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    /**
+     * @param Media $child
+     */
+    public function addChild(Media $child)
+    {
+        $this->children[] = $child;
+    }
+
+    /**
+     * @param Media $child
+     */
+    public function removeChild(Media $child)
+    {
+        $this->children->removeElement($child);
+    }
+
+    /**
+     * @return Media[]
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * @param Media $parent
+     */
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+    }
+
+    /**
+     * @return Media
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
 }

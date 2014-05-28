@@ -102,4 +102,14 @@ interface MediaProviderInterface
      * @return mixed
      */
     public function search($query);
+
+    /**
+     * Resize a media object
+     *
+     * @param Media $media
+     * @param array $profiles
+     *
+     * @return mixed
+     */
+    public function resize(Media $media, array $profiles = array());
 } 

@@ -43,7 +43,9 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         $limit    = $this->getRequest()->query->get('limit', 50);
         $page     = $this->getRequest()->query->get('page', 50);
 
-        $images = $mediaManager->findBy(array(), array(), $limit, $page, $provider);
+        $images = $mediaManager->findBy(array(
+            'parent' => null,
+        ), array(), $limit, $page, $provider);
 
         $json = array();
         foreach ($images as $image)
@@ -89,6 +91,50 @@ class MediaController extends AbstractApiController implements ClassResourceInte
 
         return $this->get('fos_rest.view_handler')->handle($view);
 
+    }
+
+
+    /**
+     * Resize a media object into all profiles
+     *
+     * @param $id
+     *
+     * @return Response
+     * @throws AccessDeniedException
+     * @throws NotFoundHttpException
+     *
+     * [PATCH] /api/media/{id}/resize.{_format}
+     */
+    public function resizeAction($id)
+    {
+        $user = $this->getUser();
+        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        {
+            throw new AccessDeniedException();
+        }
+
+        $mediaManager = $this->get('linestorm.cms.media_manager');
+
+        $provider = $this->getRequest()->query->get('p', null);
+
+        $image = $mediaManager->find($id, $provider);
+
+        if (!($image instanceof Media))
+        {
+            throw $this->createNotFoundException("Media not found");
+        }
+
+        $resizedImages = $mediaManager->resize($image, $provider);
+
+        $docs = array();
+        foreach($resizedImages as $resizedImage)
+        {
+            $docs[] = $this->getMediaDocument($resizedImage);
+        }
+
+        $view = View::create($docs);
+
+        return $this->get('fos_rest.view_handler')->handle($view);
     }
 
     /**
@@ -210,7 +256,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
     /**
      * @param $id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @throws AccessDeniedException
      *
      * [DELETE] /api/media/{id}.{_format}

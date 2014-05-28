@@ -6,18 +6,28 @@ parameters:
 
 services:
 
+  #
+  # MEDIA MODULE
   linestorm.cms.module.media:
     class: %linestorm.cms.module.media.class%
     tags:
       - { name: linestorm.cms.module }
 
+  #
+  # MEDIA MANAGER
+  linestorm.cms.media_manager:
+        class: %linestorm.cms.module.media.manager.class%
+
+  #
+  # MEDIA DEFAULT SEARCH PROVIDER
   linestorm.cms.module.media.search_provider:
     class: %linestorm.cms.module.media.search_provider.class%
     tags:
       - { name: linestorm.cms.module.search.provider, map: media }
 
   #
-  # MEDIA MANAGER
-  #
-  linestorm.cms.media_manager:
-        class: %linestorm.cms.module.media.manager.class%
+  # TWIG MEDIA MODULE
+  linestorm.cms.twig.module_media_extension:
+    class: LineStorm\MediaBundle\Twig\MediaExtension
+    tags:
+      - { name: twig.extension }

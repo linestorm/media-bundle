@@ -48,7 +48,6 @@ class MediaTransformer implements DataTransformerInterface
                     $fetched->setDescription($data->getDescription());
                     $fetched->setAlt($data->getAlt());
                     $fetched->setCredits($data->getCredits());
-                    $fetched->setSeo($data->getSeo());
 
                     $data = $fetched;
                 }

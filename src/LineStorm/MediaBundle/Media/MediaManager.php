@@ -195,4 +195,24 @@ class MediaManager implements \Countable
             $this->mediaProviders[$this->defaultProvider]->delete($media);
         }
     }
+
+    /**
+     * Resize media
+     *
+     * @param Media $media
+     * @param null  $provider
+     *
+     * @return Media[]
+     */
+    public function resize(Media $media, $provider = null)
+    {
+        if ($provider && array_key_exists($provider, $this->mediaProviders))
+        {
+            return $this->mediaProviders[$provider]->resize($media);
+        }
+        else
+        {
+            return $this->mediaProviders[$this->defaultProvider]->resize($media);
+        }
+    }
 }

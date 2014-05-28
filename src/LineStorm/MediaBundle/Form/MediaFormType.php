@@ -46,7 +46,6 @@ class MediaFormType extends AbstractType
             ))
             ->add('credits')
             ->add('alt')
-            ->add('seo')
             ->add('src', 'hidden')
             ->add('hash', 'hidden')
         ;

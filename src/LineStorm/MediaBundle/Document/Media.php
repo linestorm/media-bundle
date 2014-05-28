@@ -55,11 +55,6 @@ class Media
     protected $src;
 
     /**
-     * @var string
-     */
-    protected $seo;
-
-    /**
      * @var array Array of all api urls
      */
     protected $_api;
@@ -77,7 +72,6 @@ class Media
         $this->id           = $media->getId();
         $this->name         = $media->getName();
         $this->nameOriginal = $media->getNameOriginal();
-        $this->seo          = $media->getSeo();
         $this->src          = $media->getSrc();
         $this->title        = $media->getTitle();
 
@@ -138,14 +132,6 @@ class Media
     public function getNameOriginal()
     {
         return $this->nameOriginal;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSeo()
-    {
-        return $this->seo;
     }
 
     /**

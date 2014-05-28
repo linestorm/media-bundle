@@ -90,4 +90,35 @@
 
     {{ form_end(form) }}
 
+    {% if image %}
+        <button class="btn btn-link media-children-regenerate" data-url="{{ url('linestorm_cms_module_media_api_resize_media', {id: image.id}) }}">
+            <i class="fa-refresh"></i> Regenerate
+        </button>
+        <div class="table-responsive table-stripped">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>&nbsp;</th>
+                        <th>Name</th>
+                        <th>Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for child in image.children %}
+                        {% set imageSize = get_image_size(child.path) %}
+                        <tr class="media-child-row">
+                            <td>
+                                <button class="btn btn-link media-form-child-delete" data-url="{{ url('linestorm_cms_module_media_api_delete_media', {id: child.id}) }}) }}">
+                                    <i class="fa-trash-o text-danger"></i>
+                                </button>
+                            </td>
+                            <td><a href="{{ child.src }}" target="_blank">{{ child.title }} <i class="fa-external-link"></i></a></td>
+                            <td>{{ imageSize[0] ~ ' x ' ~ imageSize[1] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
 {% endblock %}

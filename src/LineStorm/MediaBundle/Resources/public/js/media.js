@@ -1,5 +1,5 @@
 
-define(['jquery', 'bootstrap', 'dropzone', 'cms_api'], function ($, bs, Dropzone, api) {
+define(['jquery', 'bootstrap', 'dropzone', 'typeahead', 'cms_api'], function ($, bs, Dropzone, typeahead, api) {
 
     // setup dropzone
     Dropzone.autoDiscover = false;
@@ -71,6 +71,43 @@ define(['jquery', 'bootstrap', 'dropzone', 'cms_api'], function ($, bs, Dropzone
                 });
             }
         });
+
+        $('.media-form-child-delete').on('click', function(){
+            var $mediaChildRow = $(this).closest('tr.media-child-row');
+            if(confirm("Are you sure you want to permanently delete this media?\n\nWARNING: IF IT IS USED ANYWHERE, IT WILL CREATE 404 RESPONSES")){
+                window.lineStorm.api.call($(this).data('url'), {
+                    type: 'DELETE',
+                    success: function(o){
+                        $mediaChildRow.remove();
+                    }
+                });
+            }
+        });
+
+        $('.media-children-regenerate').on('click', function(){
+            var $mediaChildRow = $(this).closest('tr.media-child-row');
+            if(confirm("Are you sure you want to regenerate all resized media?")){
+                window.lineStorm.api.call($(this).data('url'), {
+                    type: 'PATCH',
+                    success: function(o){
+                        window.location.reload()
+                    }
+                });
+            }
+        });
+
+        $('input.media-search').typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 2
+        },{
+            source: function (query, process) {
+                return $.get('/my_search_url', { query: query }, function (data) {
+                    return process(data.options);
+                });
+            }
+        });
+
     });
 
 });

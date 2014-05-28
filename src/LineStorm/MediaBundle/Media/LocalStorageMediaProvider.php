@@ -16,6 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * Local storage media provider. This provider will store all images on the local disk.
  *
  * Class LocalStorageMediaProvider
+ *
  * @package LineStorm\MediaBundle\Media
  */
 class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaProviderInterface
@@ -71,20 +72,20 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     private $storePath;
 
     /**
-     * @param EntityManager $em The Entity Manager to use
-     * @param string $mediaClass The Entity class
+     * @param EntityManager   $em         The Entity Manager to use
+     * @param string          $mediaClass The Entity class
      * @param SecurityContext $secutiryContext
-     * @param $webRoot
-     * @param string $dir
+     * @param string          $path
+     * @param string          $src
      */
-    function __construct(EntityManager $em, $mediaClass, SecurityContext $secutiryContext, $webRoot, $dir)
+    function __construct(EntityManager $em, $mediaClass, SecurityContext $secutiryContext, $path, $src)
     {
-        $this->em    = $em;
-        $this->class = $mediaClass;
-        $this->storePath = $webRoot;
-        $this->storeDirectory = $dir;
+        $this->em             = $em;
+        $this->class          = $mediaClass;
+        $this->storePath      = $path;
+        $this->storeDirectory = $src;
 
-        $token       = $secutiryContext->getToken();
+        $token = $secutiryContext->getToken();
         if($token)
         {
             $this->user = $token->getUser();
@@ -166,8 +167,19 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
         $fileMime = $file->getMimeType();
         if(array_key_exists($fileMime, $this->accept) && in_array(strtolower($extension), $this->accept[$fileMime]))
         {
-            $newFileName = md5(time() . rand()) . "." . $extension;
-            $file        = $file->move($this->storePath.$this->storeDirectory, $newFileName);
+            $newFileName = null;
+
+            // if the media name is set, use it over a hashed one
+            if($media->getName())
+            {
+                if($media->getPath() != $file->getPathname()) // if it's already in place, we don't need to move it!
+                    $newFileName = $media->getName();
+            }
+            else
+                $newFileName = md5(time() . rand()) . "." . $extension;
+
+            if($newFileName)
+                $file = $file->move($this->storePath, $newFileName);
         }
         else
         {
@@ -184,14 +196,27 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
 
             $oldPath = pathinfo($oldName);
 
-            $media->setNameOriginal($oldName);
-            $media->setName($file->getFilename());
-            $media->setDescription('Uploaded by '.$this->user->getUsername());
-            $media->setSrc($this->storeDirectory.$file->getFilename());
+            if(!$media->getNameOriginal())
+                $media->setNameOriginal($oldName);
+
+            if(!$media->getName())
+                $media->setName($file->getFilename());
+
+            if(!$media->getDescription())
+                $media->setDescription('Uploaded by ' . $this->user->getUsername());
+
+            if(!$media->getUploader())
+                $media->setUploader($this->user);
+
+            if(!$media->getAlt())
+                $media->setAlt($oldPath['filename']);
+
+            if(!$media->getCredits())
+                $media->setCredits($this->user->getUsername());
+
+            $media->setSrc($this->storeDirectory . $file->getFilename());
+            $media->setPath($this->storePath . $file->getFilename());
             $media->setHash(sha1_file($file->getPathname()));
-            $media->setUploader($this->user);
-            $media->setAlt($oldPath['filename']);
-            $media->setCredits($this->user->getUsername());
 
             $this->em->persist($media);
             $this->em->flush($media);
@@ -216,12 +241,91 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
      */
     public function delete(Media $media)
     {
-        $file = $this->storePath.$media->getSrc();
+        $file = $media->getPath();
         if($media->getSrc() && file_exists($file) && is_file($file))
             unlink($file);
         $this->em->remove($media);
         $this->em->flush();
     }
 
+    /**
+     * Resize a media object to one or many profiles
+     *
+     * @param Media $media
+     * @param array $profiles
+     *
+     * @return Media[]
+     */
+    public function resize(Media $media, array $profiles = array())
+    {
+        if(!count($profiles))
+        {
+            $profiles = array_keys($this->mediaResizers);
+        }
+
+        $resizedImages = array();
+        foreach($profiles as $profile)
+        {
+            $resizer         = $this->getResizeProfile($profile);
+            $resizedImages[] = $this->resizeImage($media, $resizer);
+        }
+
+        return $resizedImages;
+    }
+
+
+    /**
+     * Resize a media object to a set size, returns the persisted media version object
+     *
+     * @param Media        $media
+     * @param MediaResizer $resizer
+     *
+     * @return Media|null
+     */
+    protected function resizeImage(Media $media, MediaResizer $resizer)
+    {
+        $imagePath = pathinfo($media->getPath());
+        $imageSrc  = pathinfo($media->getSrc());
+
+        $image = new ImageResize($media->getPath());
+
+        $image->resizeTo($resizer->getX(), $resizer->getY());
+
+        $newWidth  = $image->getResizeWidth();
+        $newHeight = $image->getResizeHeight();
+
+        $filename         = "{$imagePath['filename']}_{$newWidth}_x_{$newHeight}.{$imagePath['extension']}";
+        $resizedImagePath = "{$imagePath['dirname']}" . DIRECTORY_SEPARATOR . "{$filename}";
+
+        $image->saveImage($resizedImagePath);
+
+        if(file_exists($resizedImagePath))
+        {
+            $file = new File($resizedImagePath);
+
+            $class = $this->class;
+            /** @var Media $resizedMedia */
+            $resizedMedia = clone $media;
+            $resizedMedia->setParent($media);
+            $resizedMedia->setTitle("{$media->getTitle()} [{$resizer->getId()} {$newWidth} x {$newHeight}]");
+
+            $resizedMedia->setName($filename);
+            $resizedMedia->setNameOriginal($media->getName());
+
+            $resizedMedia->setAlt($media->getAlt());
+            $resizedMedia->setCredits($media->getCredits());
+            $resizedMedia->setDescription($media->getDescription());
+            $resizedMedia->setUploader($media->getUploader());
+
+            try
+            {
+                return $this->store($file, $resizedMedia);
+            } catch(MediaFileAlreadyExistsException $e)
+            {
+                return $e->getEntity();
+            }
+        }
+
+    }
 
 } 
