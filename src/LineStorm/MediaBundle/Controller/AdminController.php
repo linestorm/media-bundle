@@ -224,6 +224,7 @@ class AdminController extends Controller
             if ($file->isValid())
             {
                 $media = $mediaManager->store($file, $entity);
+
                 if (!($media instanceof Media))
                 {
                     throw new HttpException(400, 'Upload Invalid');

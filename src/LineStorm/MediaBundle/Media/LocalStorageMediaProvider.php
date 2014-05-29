@@ -7,6 +7,7 @@ use Doctrine\ORM\Query;
 use LineStorm\MediaBundle\Media\Exception\MediaFileAlreadyExistsException;
 use LineStorm\MediaBundle\Media\Exception\MediaFileDeniedException;
 use LineStorm\MediaBundle\Model\Media;
+use LineStorm\SearchBundle\Search\SearchProviderInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Security\Core\SecurityContext;
@@ -72,17 +73,22 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     private $storePath;
 
     /**
-     * @param EntityManager   $em         The Entity Manager to use
-     * @param string          $mediaClass The Entity class
-     * @param SecurityContext $secutiryContext
-     * @param string          $path
-     * @param string          $src
+     * @var SearchProviderInterface
+     */
+    protected $searchProvider;
+
+    /**
+     * @param EntityManager           $em         The Entity Manager to use
+     * @param string                  $mediaClass The Entity class
+     * @param SecurityContext         $secutiryContext
+     * @param string                  $path
+     * @param string                  $src
      */
     function __construct(EntityManager $em, $mediaClass, SecurityContext $secutiryContext, $path, $src)
     {
         $this->em             = $em;
         $this->class          = $mediaClass;
-        $this->storePath      = realpath($path).DIRECTORY_SEPARATOR;
+        $this->storePath      = realpath($path) . DIRECTORY_SEPARATOR;
         $this->storeDirectory = $src;
 
         $token = $secutiryContext->getToken();
@@ -221,6 +227,9 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
             $this->em->persist($media);
             $this->em->flush($media);
 
+            // index the media object
+            $this->searchProvider->index($media);
+
             return $media;
         }
     }
@@ -230,6 +239,10 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
      */
     public function update(Media $media)
     {
+
+        // index the media object
+        $this->searchProvider->index($media);
+
         $this->em->persist($media);
         $this->em->flush($media);
 
@@ -244,6 +257,11 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
         $file = $media->getPath();
         if($media->getSrc() && file_exists($file) && is_file($file))
             unlink($file);
+
+
+        // index the media object
+        $this->searchProvider->remove($media);
+
         $this->em->remove($media);
         $this->em->flush();
     }
