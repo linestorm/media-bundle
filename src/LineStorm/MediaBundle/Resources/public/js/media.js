@@ -90,7 +90,7 @@ define(['jquery', 'bootstrap', 'dropzone', 'typeahead', 'cms_api'], function ($,
                 window.lineStorm.api.call($(this).data('url'), {
                     type: 'PATCH',
                     success: function(o){
-                        window.location.reload()
+                        window.location.reload();
                     }
                 });
             }

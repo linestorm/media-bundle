@@ -194,6 +194,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
             /** @var Media $updatedMedia */
             $updatedMedia = $form->getData();
             $mediaManager->update($updatedMedia);
+            $mediaManager->resize($updatedMedia);
 
             $view = $this->createResponse(array('location' => $this->generateUrl('linestorm_cms_module_media_api_get_media', array('id' => $form->getData()->getId()))), 200);
         }
@@ -242,6 +243,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
             /** @var Media $updatedMedia */
             $updatedMedia = $form->getData();
             $mediaManager->update($updatedMedia);
+            $mediaManager->resize($updatedMedia);
 
             $view = $this->createResponse(array('location' => $this->generateUrl('linestorm_cms_module_media_api_get_media', array('id' => $form->getData()->getId()))), 200);
         }

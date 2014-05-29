@@ -82,7 +82,7 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     {
         $this->em             = $em;
         $this->class          = $mediaClass;
-        $this->storePath      = $path;
+        $this->storePath      = realpath($path).DIRECTORY_SEPARATOR;
         $this->storeDirectory = $src;
 
         $token = $secutiryContext->getToken();

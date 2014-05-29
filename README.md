@@ -64,7 +64,7 @@ services:
             - @doctrine.orm.default_entity_manager
             - %linestorm.cms.media_provider.local_storeage.entity.class%
             - @security.context
-            - %kernel.root_dir%/../web
+            - /path/to/web/media/
             - /media/
         tags:
             - { name: linestorm.cms.media_provider }
