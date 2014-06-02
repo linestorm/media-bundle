@@ -109,6 +109,16 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     }
 
     /**
+     * Return the categoryentity class FQNS
+     *
+     * @return string
+     */
+    public function getCategoryEntityClass()
+    {
+        return $this->class."Category";
+    }
+
+    /**
      * @inheritdoc
      */
     public function find($id)

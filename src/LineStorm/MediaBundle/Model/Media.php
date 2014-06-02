@@ -9,7 +9,7 @@ use JMS\Serializer\Annotation as JMS;
 
 /**
  * Class Media
- * @package LineStorm\CmsBundle\Model
+ * @package LineStorm\MediaBundle\Model
  */
 class Media
 {

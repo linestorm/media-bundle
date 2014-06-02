@@ -37,8 +37,13 @@ class MediaFormType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $defaultProvider = $this->mediaManager->getDefaultProviderInstance();
         $builder
             ->add('title')
+            ->add('category', 'entity', array(
+                'class'    => $defaultProvider->getCategoryEntityClass(),
+                'property' => 'name',
+            ))
             ->add('description', 'textarea', array(
                 'attr' => array(
                     'style' => 'height:200px;'
