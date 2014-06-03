@@ -30,6 +30,11 @@ class Media
     protected $name;
 
     /**
+     * @var MediaCategory
+     */
+    protected $category;
+
+    /**
      * @var string
      */
     protected $nameOriginal;
@@ -93,6 +98,22 @@ class Media
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @param MediaCategory $category
+     */
+    public function setCategory(MediaCategory $category)
+    {
+        $this->category = $category;
+    }
+
+    /**
+     * @return MediaCategory
+     */
+    public function getCategory()
+    {
+        return $this->category;
     }
 
     /**

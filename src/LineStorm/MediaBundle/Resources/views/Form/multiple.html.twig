@@ -1,0 +1,37 @@
+{% import _self as fn %}
+{% macro dzPreview(form) %}
+    {% spaceless %}
+        <div class="upload-tile">
+            <div class="upload-preview">
+                <div class="upload-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+                <img class="upload-image-thumbnail" data-dz-thumbnail />
+            </div>
+
+            <button class="btn btn-link upload-remove" data-dz-remove><i class="fa-times"></i></button>
+
+            <div class="upload-caption">
+                <div class="upload-form-container">
+                    {{ form_start(form) }}
+                        {{ form_widget(form.title, {attr: {placeholder: 'Title', class: 'upload-input'} }) }}
+                        {{ form_widget(form.description, {attr: {placeholder: 'Description', class: 'upload-textarea'} }) }}
+                        {{ form_widget(form.alt, {attr: {placeholder: 'Alt Text', class: 'upload-input'} }) }}
+                        {{ form_widget(form.credits, {attr: {placeholder: 'Credits', class: 'upload-input'} }) }}
+                    {{ form_end(form) }}
+                </div>
+                <p>
+
+                </p>
+            </div>
+        </div>
+    {% endspaceless %}
+{% endmacro %}
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="dropzone"
+                 data-url="{{ path('linestorm_cms_admin_module_media_upload') }}"
+                 data-prototype="{{ fn.dzPreview(form)|e('html_attr') }}">
+                <!-- dropzone -->
+            </div>
+        </div>
+    </div>

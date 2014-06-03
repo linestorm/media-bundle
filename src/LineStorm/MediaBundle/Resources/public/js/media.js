@@ -16,20 +16,16 @@ define(['jquery', 'bootstrap', 'dropzone', 'typeahead', 'cms_api'], function ($,
             url: $dropzone.data('url'),
             maxFiles: 1,
             acceptedFiles: 'image/*',
+            thumbnailWidth: null,
+            thumbnailHeight: null,
             init: function(){
                 this.on("success", function(file, response) {
-                    if(file.xhr.status == 200){
-                        alert('An identical file already exists.');
-                    } else {
-                        $form.find('.img-preview > img').attr('src', response.src);
-                        $form.find('input[name*="[src]"]').val(response.src);
-                        $form.find('input[name*="[hash]"]').val(response.hash);
-                        $form.find('input[name*="[title]"]').val(response.title);
-                        $('.media-form').slideDown();
-                        $dropzone.hide();
-                    }
-                    this.removeFile(file);
-
+                    var $form = $(file.previewElement);
+                    $form.find('input[name*="[description]"]').val(response.description);
+                    $form.find('input[name*="[alt]"]').val(response.alt);
+                    $form.find('input[name*="[src]"]').val(response.src);
+                    $form.find('input[name*="[hash]"]').val(response.hash);
+                    $form.find('input[name*="[title]"]').val(response.title);
                 });
                 this.on("error", function(file, response) {
                     this.removeFile(file);

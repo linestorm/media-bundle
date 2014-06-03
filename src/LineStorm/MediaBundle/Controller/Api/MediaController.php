@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * API for media bundle
+ * API for Media
  *
  * Class MediaController
  *
@@ -32,7 +32,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
     public function getAllAction()
     {
         $user = $this->getUser();
-        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
             throw new AccessDeniedException();
         }
@@ -48,7 +48,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         ), array(), $limit, $page, $provider);
 
         $json = array();
-        foreach ($images as $image)
+        foreach($images as $image)
             $json[] = $this->getMediaDocument($image);
 
         $view = View::create($json);
@@ -71,7 +71,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
     public function getAction($id)
     {
         $user = $this->getUser();
-        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
             throw new AccessDeniedException();
         }
@@ -82,7 +82,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
 
         $image = $mediaManager->find($id, $provider);
 
-        if (!($image instanceof Media))
+        if(!($image instanceof Media))
         {
             throw $this->createNotFoundException("Media not found");
         }
@@ -108,7 +108,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
     public function resizeAction($id)
     {
         $user = $this->getUser();
-        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
             throw new AccessDeniedException();
         }
@@ -119,7 +119,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
 
         $image = $mediaManager->find($id, $provider);
 
-        if (!($image instanceof Media))
+        if(!($image instanceof Media))
         {
             throw $this->createNotFoundException("Media not found");
         }
@@ -149,18 +149,19 @@ class MediaController extends AbstractApiController implements ClassResourceInte
     public function searchAction()
     {
         $user = $this->getUser();
-        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
             throw new AccessDeniedException();
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
-        $provider = $this->getRequest()->query->get('p', null);
+        $provider     = $this->getRequest()->query->get('p', null);
 
-        $query = $this->getRequest()->query->get('q', null);
+        $query  = $this->getRequest()->query->get('q', null);
         $images = $mediaManager->search($query, $provider);
 
         $view = View::create($images);
+
         return $this->get('fos_rest.view_handler')->handle($view);
     }
 
@@ -175,7 +176,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
     public function postAction()
     {
         $user = $this->getUser();
-        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
             throw new AccessDeniedException();
         }
@@ -189,7 +190,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
 
         $form->submit($formValues['linestorm_cms_form_media']);
 
-        if ($form->isValid())
+        if($form->isValid())
         {
             /** @var Media $updatedMedia */
             $updatedMedia = $form->getData();
@@ -220,7 +221,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
     public function putAction($id)
     {
         $user = $this->getUser();
-        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
             throw new AccessDeniedException();
         }
@@ -238,7 +239,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
 
         $form->submit($formValues['linestorm_cms_form_media']);
 
-        if ($form->isValid())
+        if($form->isValid())
         {
             /** @var Media $updatedMedia */
             $updatedMedia = $form->getData();
@@ -267,7 +268,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
     {
 
         $user = $this->getUser();
-        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
             throw new AccessDeniedException();
         }
@@ -286,6 +287,27 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         ));
 
         return $this->get('fos_rest.view_handler')->handle($view);
+    }
+
+    public function batchAction()
+    {
+        $user = $this->getUser();
+        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        {
+            throw new AccessDeniedException();
+        }
+
+        $mediaManager = $this->get('linestorm.cms.media_manager');
+        $provider     = $mediaManager->getDefaultProviderInstance();
+
+        $form = $this->createForm('linestorm_cms_form_media_multiple', null, array(
+            'action' => $this->generateUrl('linestorm_cms_module_media_api_post_media'),
+            'method' => 'POST',
+        ));
+
+        return $this->render('LineStormMediaBundle:Form:multiple.html.twig', array(
+            'form'  => $form->createView(),
+        ));
     }
 
     /**
