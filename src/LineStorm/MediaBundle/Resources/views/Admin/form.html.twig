@@ -1,43 +1,10 @@
 {% extends 'LineStormCmsBundle:Admin:layout.html.twig' %}
 
-{% import _self as fn %}
-{% macro dzPreview(child) %}
-    {% spaceless %}
-        <div class="dz-preview">
-            <div class="panel-left">
-                <img class="dz-image" data-dz-thumbnail {% if child %}src="{{ child.image.offsetGet('src').vars.value }}"{% endif %} />
-                <a class="dz-remove" href="javascript:undefined;" data-dz-remove><i class="fa-times"></i> Remove</a>
-            </div>
-            <div class="dz-details">
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
-                    </div>
-                </div>
-                {% if not child %}
-                    <div class="row">
-                        <div class="col-xs-4">
-                            <strong>Details:</strong>
-                        </div>
-                        <div class="col-xs-8">
-                            <div class="dz-size" data-dz-size>Uploaded</div>
-                        </div>
-                    </div>
-                {% endif %}
-                <div class="dz-image-form" data-prototype="<div>__widget__</div>" data-count="0">
-                    {% if child %}{{ form_row(child) }}{% endif %}
-                </div>
-            </div>
-            <div class="clearfix"></div>
-        </div>
-    {% endspaceless %}
-{% endmacro %}
-
 {% block head %}
     {% block requirejs %}
         {{
             include('LineStormCmsBundle::requirejs.html.twig', {
-                requirejs_module: ['cms_main', 'cms_media']
+                requirejs_module: ['cms_main', 'cms_media', 'cms_media_treebrowser']
             })
         }}
     {% endblock %}
@@ -53,72 +20,6 @@
 
 {% block module %}
 
-    <div id="FormErrors" class="alert alert-danger" style="display: none;">
-
-    </div>
-
-    {{ form_start(form, {attr: { class: 'api-save'} }) }}
-
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="img-preview">
-                    <img src="{{ form.src.vars.value }}">
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="dropzone" data-url="{% if image %}{{ path('linestorm_cms_admin_module_media_upload_edit', {id:image.id}) }}{% else %}{{ path('linestorm_cms_admin_module_media_upload') }}{% endif %}" data-prototype="{{ fn.dzPreview()|e('html_attr') }}"></div>
-            </div>
-        </div>
-
-        <div class="media-form"{% if not image %} style="display: none;"{% endif %}>
-            {% for child in form %}
-                {{ form_row(child) }}
-            {% endfor %}
-
-            <hr />
-
-            <div class="form-group">
-                <div class="col-sm-12">
-                    <button type="submit" class="btn btn-default post-save"><i class="fa-save"></i> Save</button>
-                    {% block media_form_buttons %}
-                    {% endblock %}
-                </div>
-            </div>
-        </div>
-
-    {{ form_end(form) }}
-
-    {% if image %}
-        <button class="btn btn-link media-children-regenerate" data-url="{{ url('linestorm_cms_module_media_api_resize_media', {id: image.id}) }}">
-            <i class="fa-refresh"></i> Regenerate
-        </button>
-        <div class="table-responsive table-stripped">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>&nbsp;</th>
-                        <th>Name</th>
-                        <th>Size</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for child in image.children %}
-                        {% set imageSize = get_image_size(child.path) %}
-                        <tr class="media-child-row">
-                            <td>
-                                <button class="btn btn-link media-form-child-delete" data-url="{{ url('linestorm_cms_module_media_api_delete_media', {id: child.id}) }}) }}">
-                                    <i class="fa-trash-o text-danger"></i>
-                                </button>
-                            </td>
-                            <td><a href="{{ child.src }}" target="_blank">{{ child.title }} <i class="fa-external-link"></i></a></td>
-                            <td>{{ imageSize[0] ~ ' x ' ~ imageSize[1] }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% endif %}
+    {% include 'LineStormMediaBundle:Form:multiple.html.twig' %}
 
 {% endblock %}

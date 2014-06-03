@@ -9,11 +9,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class MediaFormType
+ * Class MediaCategoryFormType
  *
  * @package LineStorm\MediaBundle\Form
  */
-class MediaFormType extends AbstractType
+class MediaCategoryFormType extends AbstractType
 {
 
     /**
@@ -37,27 +37,9 @@ class MediaFormType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $defaultProvider = $this->mediaManager->getDefaultProviderInstance();
         $builder
-            ->add('title')
-            /*->add('category', 'mediatreebrowser', array(
-                'class'    => $defaultProvider->getCategoryEntityClass(),
-                'property' => 'name',
-            ))*/
-            ->add('description', 'textarea', array(
-                'attr' => array(
-                    'style' => 'height:200px;'
-                ),
-            ))
-            ->add('credits')
-            ->add('alt')
-            ->add('src', 'hidden')
-            ->add('hash', 'hidden')
+            ->add('name')
         ;
-
-        $transformer = new MediaTransformer($this->mediaManager);
-
-        $builder->addModelTransformer($transformer);
     }
     
     /**
@@ -68,7 +50,7 @@ class MediaFormType extends AbstractType
         $defaultProvider = $this->mediaManager->getDefaultProviderInstance();
         $resolver->setDefaults(array(
             'label' => false,
-            'data_class' => $defaultProvider->getEntityClass()
+            'data_class' => $defaultProvider->getCategoryEntityClass()
         ));
     }
 
@@ -77,6 +59,6 @@ class MediaFormType extends AbstractType
      */
     public function getName()
     {
-        return 'linestorm_cms_form_media';
+        return 'linestorm_cms_form_media_category';
     }
 }

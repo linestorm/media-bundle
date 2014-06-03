@@ -1,5 +1,11 @@
-linestorm_cms_module_media_api_controller:
+linestorm_cms_module_media_api_media_controller:
     type:         rest
     resource:     LineStorm\MediaBundle\Controller\Api\MediaController
     name_prefix:  linestorm_cms_module_media_api_
     prefix:       /api
+
+linestorm_cms_module_media_api_category_controller:
+    type:         rest
+    resource:     LineStorm\MediaBundle\Controller\Api\CategoryController
+    name_prefix:  linestorm_cms_module_media_api_
+    prefix:       /api/media

@@ -12,7 +12,8 @@
     "dropzone": ">= 3.8.0",
     "requirejs": "~2.1.11",
     "requirejs-domready": "~2.0.1",
-    "sass-bootstrap": "~3.0.2"
+    "sass-bootstrap": "~3.0.2",
+    "jstree": "~3.0"
   },
   "ignore": [
     "**/.*",

@@ -11,8 +11,26 @@ services:
         tags:
             - { name: form.type, alias: mediaentity }
 
+  linestorm.cms.form.type.widget.mediatreebrowser:
+        class: LineStorm\MediaBundle\Form\Type\MediaTreeBrowserType
+        arguments: [@linestorm.cms.model_manager, @linestorm.cms.module_manager]
+        tags:
+            - { name: form.type, alias: mediatreebrowser }
+
   linestorm.cms.form.type.media:
         class: LineStorm\MediaBundle\Form\MediaFormType
         arguments: [@linestorm.cms.media_manager]
         tags:
             - { name: form.type, alias: linestorm_cms_form_media }
+
+  linestorm.cms.form.type.media_multiple:
+        class: LineStorm\MediaBundle\Form\MediaMultipleFormType
+        arguments: [@linestorm.cms.media_manager]
+        tags:
+            - { name: form.type, alias: linestorm_cms_form_media_multiple }
+
+  linestorm.cms.form.type.media_category:
+        class: LineStorm\MediaBundle\Form\MediaCategoryFormType
+        arguments: [@linestorm.cms.media_manager]
+        tags:
+            - { name: form.type, alias: linestorm_cms_form_media_category }

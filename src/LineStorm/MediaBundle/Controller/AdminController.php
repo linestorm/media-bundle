@@ -92,8 +92,9 @@ class AdminController extends Controller
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
         $provider     = $mediaManager->getDefaultProviderInstance();
+        $class = $provider->getEntityClass();
 
-        $form = $this->createForm($provider->getForm(), null, array(
+        $form = $this->createForm($provider->getForm(), new $class(), array(
             'action' => $this->generateUrl('linestorm_cms_module_media_api_post_media'),
             'method' => 'POST',
         ));

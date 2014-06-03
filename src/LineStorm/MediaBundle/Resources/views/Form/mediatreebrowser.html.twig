@@ -1,0 +1,4 @@
+{% block mediatreebrowser_widget %}
+    {{ form_row(form) }}
+    <div id="media-tree" data-root="{{ root }}" data-init="{% if form.vars.node %}{{ form.vars.node.id }}{% endif %}" data-input="{{ form.vars.id }}"></div>
+{% endblock %}
