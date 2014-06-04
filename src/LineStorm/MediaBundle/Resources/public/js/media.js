@@ -12,34 +12,57 @@ define(['jquery', 'bootstrap', 'dropzone', 'typeahead', 'cms_api'], function ($,
         $form = $('form[name="linestorm_cms_form_media"]');
         $dropzone = $('.dropzone');
 
-        carrosselDropZone = new Dropzone($dropzone[0], {
-            url: $dropzone.data('url'),
-            maxFiles: 1,
-            acceptedFiles: 'image/*',
-            thumbnailWidth: null,
-            thumbnailHeight: null,
-            init: function(){
-                this.on("success", function(file, response) {
-                    var $form = $(file.previewElement);
-                    $form.find('input[name*="[description]"]').val(response.description);
-                    $form.find('input[name*="[alt]"]').val(response.alt);
-                    $form.find('input[name*="[src]"]').val(response.src);
-                    $form.find('input[name*="[hash]"]').val(response.hash);
-                    $form.find('input[name*="[title]"]').val(response.title);
-                });
-                this.on("error", function(file, response) {
-                    this.removeFile(file);
-                    alert("Cannot add file: "+response);
-                });
-            },
-            previewTemplate: $dropzone.data('prototype')
-        });
+        if($dropzone.length){
+            carrosselDropZone = new Dropzone($dropzone[0], {
+                url: $dropzone.data('url'),
+                acceptedFiles: 'image/*',
+                thumbnailWidth: null,
+                thumbnailHeight: null,
+                init: function(){
+                    this.on("success", function(file, response) {
+                        var $form = $(file.previewElement);
+                        $form.find('input[name*="[alt]"]').val(response.alt);
+                        $form.find('input[name*="[src]"]').val(response.src);
+                        $form.find('input[name*="[hash]"]').val(response.hash);
+                        $form.find('input[name*="[credits]"]').val(response.credits);
+                        $form.find('textarea[name*="[title]"]').val(response.title);
+                    });
+                    this.on("error", function(file, response) {
+                        this.removeFile(file);
+                        alert("Cannot add file: "+response);
+                    });
+                },
+                previewTemplate: $dropzone.data('prototype')
+            });
 
-        $form.on('submit', function(e){
+            $('.media-api-save').on('click', function(e){
+                e.preventDefault();
+                e.stopPropagation();
+
+                var forms = $('form[name="linestorm_cms_form_media"]');
+                window.lineStorm.api.saveForm(forms, function(on, status, xhr){
+                    if(xhr.status === 200){
+                    } else if(xhr.status === 201) {
+                    } else {
+                    }
+                }, function(e, status, ex){
+                    if(e.status === 400){
+                        if(e.responseJSON){
+                        } else {
+                            alert(status);
+                        }
+                    }
+                });
+
+                return false;
+            });
+        }
+
+        $('form.api-save').on('submit', function(e){
             e.preventDefault();
             e.stopPropagation();
-            $('#FormErrors').slideUp(function(){ $(this).html(''); });
-            window.lineStorm.api.saveForm($form, function(on, status, xhr){
+
+            window.lineStorm.api.saveForm($(this), function(on, status, xhr){
                 if(xhr.status === 200){
                 } else if(xhr.status === 201) {
                 } else {

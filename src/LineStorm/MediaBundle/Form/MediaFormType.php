@@ -39,15 +39,10 @@ class MediaFormType extends AbstractType
     {
         $defaultProvider = $this->mediaManager->getDefaultProviderInstance();
         $builder
-            ->add('title')
-            /*->add('category', 'mediatreebrowser', array(
+            ->add('title', 'textarea')
+            ->add('category', 'mediatreebrowser', array(
                 'class'    => $defaultProvider->getCategoryEntityClass(),
                 'property' => 'name',
-            ))*/
-            ->add('description', 'textarea', array(
-                'attr' => array(
-                    'style' => 'height:200px;'
-                ),
             ))
             ->add('credits')
             ->add('alt')

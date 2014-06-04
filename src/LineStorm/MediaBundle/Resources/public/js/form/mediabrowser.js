@@ -5,37 +5,36 @@ define(['jquery', 'bootstrap', 'jstree'], function ($, bs, jstree) {
         for (var i in o) {
             var n = o[i];
             o[i].text = n.name;
-            o[i].type = "default";
             if ('children' in o[i]) {
                 processNode(o[i].children);
+            } else {
+                o[i].children = true;
             }
 
             if ('media' in o[i]) {
                 for (var j in o[i].media) {
                     o[i].children = o[i].children || [];
                     o[i].children.push({
-                        id: 'm-' + o[i].media[j].id,
-                        text: o[i].media[j].title,
-                        type: "file"
+                        id: 'm-'+o[i].media.id,
+                        text: o[i].media.title
                     })
                 }
-            }
-
-            if ("undefined" == typeof o[i].children) {
+                processNode(o[i].children);
+            } else {
                 o[i].children = true;
             }
         }
     };
 
     $tree.jstree({
-        core: {
-            animation: 0,
-            check_callback: false,
-            themes: { stripes: true },
-            multiple: false,
-            data: {
-                url: $tree.data('root'),
-                data: function (node) {
+        "core": {
+            "animation": 0,
+            "check_callback": false,
+            "themes": { "stripes": true },
+            "multiple": false,
+            "data": {
+                'url': $tree.data('root'),
+                'data': function (node) {
                     if (node.id == '#') {
                         var initId = $tree.data('init');
                         if (initId) {
@@ -43,32 +42,28 @@ define(['jquery', 'bootstrap', 'jstree'], function ($, bs, jstree) {
                         }
                     }
 
-                    return { id: node.id };
+                    return { 'id': node.id };
                 },
-                success: function (o) {
+                'success': function (o) {
                     processNode(o);
                 }
             }
         },
-        types: {
+        "types": {
             "#": {
-                valid_children: ["root"]
+                "valid_children": ["root"]
             },
-            root: {
-                icon: "/static/3.0.1/assets/images/tree_icon.png",
-                valid_children: ["default", "file"]
+            "root": {
+                "icon": "/static/3.0.1/assets/images/tree_icon.png",
+                "valid_children": ["default"]
             },
-            default: {
-                icon: "fa fa-folder-open",
-                valid_children: ["default", "file"]
-            },
-            file: {
-                icon: "fa fa-picture-o",
-                "valid_children": []
+            "default": {
+                "icon": "fa-folder-open",
+                "valid_children": ["default"]
             }
         },
-        plugins: [
-            "wholerow", "types"
+        "plugins": [
+            "wholerow"
         ]
     })
         .on('select_node.jstree', function (n, s, e) {

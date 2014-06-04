@@ -43,7 +43,7 @@ abstract class MediaCategory extends BaseMediaCategory
     /**
      * @var Media
      *
-     * @ORM\OneToMany(targetEntity="Media", mappedBy="Category")
+     * @ORM\OneToMany(targetEntity="Media", mappedBy="category")
      */
     protected $media;
 

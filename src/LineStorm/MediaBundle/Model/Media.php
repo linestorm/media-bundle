@@ -57,11 +57,6 @@ class Media
     /**
      * @var string
      */
-    protected $description;
-
-    /**
-     * @var string
-     */
     protected $src;
 
     /**
@@ -179,22 +174,6 @@ class Media
     public function getCredits()
     {
         return $this->credits;
-    }
-
-    /**
-     * @param string $description
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
     }
 
     /**

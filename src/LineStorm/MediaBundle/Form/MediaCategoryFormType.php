@@ -39,6 +39,7 @@ class MediaCategoryFormType extends AbstractType
     {
         $builder
             ->add('name')
+            ->add('parent', 'mediatreebrowser')
         ;
     }
     
