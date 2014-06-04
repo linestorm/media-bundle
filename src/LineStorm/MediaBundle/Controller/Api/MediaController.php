@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Exception\ValidatorException;
 
 /**
  * API for Media
@@ -289,25 +290,66 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         return $this->get('fos_rest.view_handler')->handle($view);
     }
 
-    public function batchAction()
+    // BATCH METHODS
+    /**
+     * Batch put media
+     *
+     * @param $id
+     *
+     * @throws AccessDeniedException
+     * @return Response
+     */
+    public function putBatchAction($id)
     {
         $user = $this->getUser();
-        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
             throw new AccessDeniedException();
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
-        $provider     = $mediaManager->getDefaultProviderInstance();
 
-        $form = $this->createForm('linestorm_cms_form_media_multiple', null, array(
-            'action' => $this->generateUrl('linestorm_cms_module_media_api_post_media'),
-            'method' => 'POST',
-        ));
+        $provider = $this->getRequest()->query->get('p', null);
 
-        return $this->render('LineStormMediaBundle:Form:multiple.html.twig', array(
-            'form'  => $form->createView(),
-        ));
+        $image = $mediaManager->find($id, $provider);
+
+        $request = $this->getRequest();
+        $form    = $this->getForm($image);
+
+        $payload = json_decode($request->getContent(), true);
+
+        $entities = array();
+        try
+        {
+            foreach($payload as $formData)
+            {
+                $form->submit($formData['linestorm_cms_form_media']);
+
+                if($form->isValid())
+                {
+                    /** @var Media $updatedMedia */
+                    $entities[] = $form->getData();
+                }
+                else
+                {
+                    throw new ValidatorException();
+                }
+            }
+
+            foreach($entities as $entity)
+            {
+                $mediaManager->update($entity);
+                $mediaManager->resize($entity);
+            }
+
+            $view = $this->createResponse(array(), 200);
+        }
+        catch(ValidatorException $e)
+        {
+            $view = View::create($form);
+        }
+
+        return $this->get('fos_rest.view_handler')->handle($view);
     }
 
     /**
