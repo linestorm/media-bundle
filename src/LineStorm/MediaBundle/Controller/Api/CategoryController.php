@@ -180,11 +180,15 @@ class CategoryController extends AbstractApiController implements ClassResourceI
             $parentNode = $node;
             while(!$found && $i <= $limit)
             {
-                $parentNode = $parentNode->getParent();
-                if($parentNode->getParent() === null)
+                $cNode = $parentNode->getParent();
+                if($cNode === null)
                 {
                     $found = true;
                     $rootNode = $parentNode;
+                }
+                else
+                {
+                    $parentNode = $cNode;
                 }
 
                 $tree[] = $parentNode->getId();
@@ -211,6 +215,54 @@ class CategoryController extends AbstractApiController implements ClassResourceI
         }
 
         $categories = $qb->getQuery()->getArrayResult();
+
+        $view = View::create($categories);
+
+        return $this->get('fos_rest.view_handler')->handle($view);
+    }
+
+
+    /**
+     * Get a tree root
+     *
+     * @param Request $request
+     *
+     * @return Response
+     * @throws NotFoundHttpException
+     *
+     * [GET] /api/media/category/mediatree.{_format}
+     */
+    public function getMediatreeAction(Request $request)
+    {
+        $modelManager = $this->getModelManager();
+        $repo = $modelManager->get('media_category');
+
+        $node = $request->query->get('id', null);
+
+        if(is_numeric($node))
+        {
+            $qb = $repo->createQueryBuilder('c')
+                ->leftJoin('c.media', 'm')
+                ->addSelect('m')
+                ->join('c.parent', 'p')
+                ->where('p.id = ?1')
+                ->orWhere('(m.category = c AND c.id=?1)')
+                ->setParameter(1, $node);
+        }
+        else
+        {
+            $qb = $repo->createQueryBuilder('c')
+                ->leftJoin('c.media', 'm')
+                ->addSelect('m')
+                ->where('c.parent IS NULL');
+        }
+
+        $categories = $qb->getQuery()->getArrayResult();
+
+        foreach($categories as &$category)
+        {
+            $category['url'] = $this->generateUrl('linestorm_cms_admin_module_media_category_edit', array('id' => $category['id']));
+        }
 
         $view = View::create($categories);
 

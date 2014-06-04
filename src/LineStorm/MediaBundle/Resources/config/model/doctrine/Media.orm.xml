@@ -2,14 +2,13 @@
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
   <mapped-superclass name="LineStorm\MediaBundle\Model\Media" table="cms_media">
 
-    <field name="title" type="string" length="50" column="title" precision="0" scale="0" nullable="false"/>
+    <field name="title" type="string" length="255" column="title" precision="0" scale="0" nullable="false"/>
     <field name="name" type="string" length="50" column="name" precision="0" scale="0" nullable="false"/>
     <field name="nameOriginal" type="string" length="50" column="name_original" precision="0" scale="0" nullable="false"/>
     <field name="hash" type="string" length="40" column="img_hash" precision="0" scale="0" nullable="false"/>
 
     <field name="alt" type="string" length="100" column="alt_text" precision="0" scale="0" nullable="true"/>
     <field name="credits" type="string" length="100" column="credits" precision="0" scale="0" nullable="true"/>
-    <field name="description" type="string" length="255" column="description" precision="0" scale="0" nullable="true"/>
 
     <field name="src" type="string" length="255" column="src" precision="0" scale="0" nullable="false"/>
     <field name="path" type="string" length="255" column="path" precision="0" scale="0" nullable="false"/>

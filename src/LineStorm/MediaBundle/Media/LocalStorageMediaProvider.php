@@ -218,9 +218,6 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
             if(!$media->getName())
                 $media->setName($file->getFilename());
 
-            if(!$media->getDescription())
-                $media->setDescription('Uploaded by ' . $this->user->getUsername());
-
             if(!$media->getUploader())
                 $media->setUploader($this->user);
 
@@ -342,7 +339,6 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
 
             $resizedMedia->setAlt($media->getAlt());
             $resizedMedia->setCredits($media->getCredits());
-            $resizedMedia->setDescription($media->getDescription());
             $resizedMedia->setUploader($media->getUploader());
 
             try

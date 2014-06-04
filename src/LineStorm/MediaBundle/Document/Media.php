@@ -47,11 +47,6 @@ class Media
     /**
      * @var string
      */
-    protected $description;
-
-    /**
-     * @var string
-     */
     protected $src;
 
     /**
@@ -67,7 +62,6 @@ class Media
     {
         $this->alt          = $media->getAlt();
         $this->credits      = $media->getCredits();
-        $this->description  = $media->getDescription();
         $this->hash         = $media->getHash();
         $this->id           = $media->getId();
         $this->name         = $media->getName();
@@ -93,15 +87,6 @@ class Media
     {
         return $this->credits;
     }
-
-    /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
     /**
      * @return string
      */

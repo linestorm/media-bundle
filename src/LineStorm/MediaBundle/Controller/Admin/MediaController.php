@@ -1,6 +1,6 @@
 <?php
 
-namespace LineStorm\MediaBundle\Controller;
+namespace LineStorm\MediaBundle\Controller\Admin;
 
 use FOS\RestBundle\View\View;
 use LineStorm\MediaBundle\Media\Exception\MediaFileAlreadyExistsException;
@@ -13,11 +13,11 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Class AdminController
+ * Class MediaController
  *
  * @package LineStorm\MediaBundle\Controller
  */
-class AdminController extends Controller
+class MediaController extends Controller
 {
 
     /**

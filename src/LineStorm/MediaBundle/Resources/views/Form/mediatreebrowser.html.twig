@@ -1,4 +1,11 @@
-{% block mediatreebrowser_widget %}
-    {{ form_row(form) }}
-    <div id="media-tree" data-root="{{ root }}" data-init="{% if form.vars.node %}{{ form.vars.node.id }}{% endif %}" data-input="{{ form.vars.id }}"></div>
-{% endblock %}
+{{
+    include('LineStormCmsBundle::requirejs.html.twig', {
+        requirejs_module: ['cms_media_treebrowser']
+    })
+}}
+<div id="media-tree"
+     data-root="{{ url }}"
+     data-init="{% if init_node is defined %}{{ init_node }}{% endif %}"
+     data-input="{% if input is defined %}{{ input }}{% endif %}">
+    <!-- media tree -->
+</div>
