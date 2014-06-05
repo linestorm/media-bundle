@@ -6,6 +6,7 @@
 <div id="media-tree"
      data-root="{{ url }}"
      data-init="{% if init_node is defined %}{{ init_node }}{% endif %}"
-     data-input="{% if input is defined %}{{ input }}{% endif %}">
+     data-input="{% if input is defined %}{{ input }}{% endif %}"
+     data-exclude="{% if exclude_nodes is defined %}{{ exclude_nodes }}{% endif %}">
     <!-- media tree -->
 </div>

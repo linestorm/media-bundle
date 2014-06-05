@@ -34,3 +34,8 @@ linestorm_cms_admin_module_media_category_edit:
     defaults: { _controller: LineStormMediaBundle:Admin/Category:edit }
     requirements:
        id: \d+
+
+
+linestorm_cms_admin_module_media_category_create:
+    pattern:  /category/new
+    defaults: { _controller: LineStormMediaBundle:Admin/Category:new }

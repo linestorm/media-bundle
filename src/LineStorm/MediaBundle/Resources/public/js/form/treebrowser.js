@@ -1,5 +1,6 @@
 define(['jquery', 'bootstrap', 'jstree'], function ($, bs, jstree) {
     var $tree = $('#media-tree');
+    var exclude = ($tree.data('exclude') || "").toString().split(',');
 
     var processNode = function (o) {
         for (var i in o) {
@@ -36,14 +37,19 @@ define(['jquery', 'bootstrap', 'jstree'], function ($, bs, jstree) {
             data: {
                 url: $tree.data('root'),
                 data: function (node) {
+                    var data = {};
+                    data['exclude'] = exclude;
+
                     if (node.id == '#') {
                         var initId = $tree.data('init');
                         if (initId) {
-                            return {to: initId};
+                            data['to'] = initId;
+                            return data;
                         }
                     }
 
-                    return { id: node.id };
+                    data['id'] = node.id;
+                    return data;
                 },
                 success: function (o) {
                     processNode(o);

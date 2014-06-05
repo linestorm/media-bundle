@@ -5,26 +5,29 @@
 
 {% block module %}
 
-    {{ form_start(form, {attr: { class: 'api-save'} }) }}
+    {{ form_start(form, {attr: { class: 'api-save', 'data-count': category.media|length } }) }}
         {{ form_row(form.name) }}
 
         <div class="form-group">
             {{ form_label(form.parent) }}
             <div class="col-sm-10">
                 {{ form_widget(form.parent) }}
+
+                {% set parent_node = null %}
+                {% if category.parent != null %}
+                    {% set parent_node = category.parent.id %}
+                {% endif %}
+
                 {{
-                    include('LineStormMediaBundle:Form:mediatreebrowser.html.twig', {
-                        url: url('linestorm_cms_module_media_api_get_category_tree'),
-                        init_node: category.parent.id,
+                    include('LineStormMediaBundle:Form:multiple.html.twig', {
+                        init_node: parent_node,
+                        exclude_nodes: category.id,
                         input: '#linestorm_cms_form_media_category_parent'
                     })
                 }}
             </div>
         </div>
 
-        {{
-
-        }}
 
         <div class="form-group">
             <div class="col-sm-12">
@@ -32,14 +35,13 @@
                 <button type="submit" class="btn btn-primary" data-url="{{ url('linestorm_cms_module_media_api_put_category', {id: category.id}) }}">
                     <i class="fa-save"></i> Save
                 </button>
-                <a class="btn btn-primary" data-url="{{ url('linestorm_cms_module_media_api_put_category', {id: category.id}) }}">
-                    <i class="fa-picture-o"></i> Pictures
-                </a>
+
                 <button type="button" class="btn btn-danger media-form-delete" data-url="{{ path('linestorm_cms_module_media_api_delete_category', {id: category.id}) }}">
                     <i class="fa-trash-o"></i> Delete
                 </button>
             </div>
         </div>
 
+        {{ form_widget(form.media) }}
     {{ form_end(form) }}
 {% endblock %}

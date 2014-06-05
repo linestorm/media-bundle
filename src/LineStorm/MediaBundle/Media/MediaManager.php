@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\File\File;
  * Class MediaManager
  *
  * @package LineStorm\MediaBundle\Media
+ * @author  Andy Thorne <contrabandvr@gmail.com>
  */
 class MediaManager implements \Countable
 {
@@ -77,7 +78,7 @@ class MediaManager implements \Countable
      */
     public function find($id, $provider = null)
     {
-        if ($provider && array_key_exists($provider, $this->mediaProviders))
+        if($provider && array_key_exists($provider, $this->mediaProviders))
         {
             return $this->mediaProviders[$provider]->find($id);
         }
@@ -100,7 +101,7 @@ class MediaManager implements \Countable
      */
     public function findBy(array $terms, $provider = null)
     {
-        if ($provider && array_key_exists($provider, $this->mediaProviders))
+        if($provider && array_key_exists($provider, $this->mediaProviders))
         {
             return $this->mediaProviders[$provider]->findBy($terms);
         }
@@ -122,7 +123,7 @@ class MediaManager implements \Countable
      */
     public function search($query, $provider = null)
     {
-        if ($provider && array_key_exists($provider, $this->mediaProviders))
+        if($provider && array_key_exists($provider, $this->mediaProviders))
         {
             return $this->mediaProviders[$provider]->searchBy($query);
         }
@@ -135,23 +136,44 @@ class MediaManager implements \Countable
     }
 
     /**
-     * Store the file into the bank
+     * Upload a media file
      *
      * @param File   $file
      * @param Media  $media
      * @param string $provider
      *
-     * @return Media
+     * @return mixed
      */
-    public function store(File $file, Media $media = null, $provider = null)
+    public function upload(File $file, Media $media = null, $provider = null)
     {
-        if ($provider && array_key_exists($provider, $this->mediaProviders))
+        if($provider && array_key_exists($provider, $this->mediaProviders))
         {
-            return $this->mediaProviders[$provider]->store($file, $media);
+            return $this->mediaProviders[$provider]->upload($file, $media);
         }
         else
         {
-            return $this->mediaProviders[$this->defaultProvider]->store($file, $media);
+            return $this->mediaProviders[$this->defaultProvider]->upload($file, $media);
+        }
+    }
+
+
+    /**
+     * Store the file into the bank
+     *
+     * @param Media  $media
+     * @param string $provider
+     *
+     * @return Media
+     */
+    public function store(Media $media, $provider = null)
+    {
+        if($provider && array_key_exists($provider, $this->mediaProviders))
+        {
+            return $this->mediaProviders[$provider]->store($media);
+        }
+        else
+        {
+            return $this->mediaProviders[$this->defaultProvider]->store($media);
         }
     }
 
@@ -165,7 +187,7 @@ class MediaManager implements \Countable
      */
     public function update(Media $media, $provider = null)
     {
-        if ($provider && array_key_exists($provider, $this->mediaProviders))
+        if($provider && array_key_exists($provider, $this->mediaProviders))
         {
             return $this->mediaProviders[$provider]->update($media);
         }
@@ -186,7 +208,7 @@ class MediaManager implements \Countable
      */
     public function delete(Media $media, $provider = null)
     {
-        if ($provider && array_key_exists($provider, $this->mediaProviders))
+        if($provider && array_key_exists($provider, $this->mediaProviders))
         {
             $this->mediaProviders[$provider]->delete($media);
         }
@@ -206,7 +228,7 @@ class MediaManager implements \Countable
      */
     public function resize(Media $media, $provider = null)
     {
-        if ($provider && array_key_exists($provider, $this->mediaProviders))
+        if($provider && array_key_exists($provider, $this->mediaProviders))
         {
             return $this->mediaProviders[$provider]->resize($media);
         }

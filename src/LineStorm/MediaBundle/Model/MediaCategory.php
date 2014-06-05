@@ -113,6 +113,17 @@ class MediaCategory
     }
 
     /**
+     * This is for doctrine as it can be retarded
+     * TODO: override doctrine
+     *
+     * @param Media $media
+     */
+    public function addMedion(Media $media)
+    {
+        $this->media[] = $media;
+    }
+
+    /**
      * @param Media $media
      */
     public function addMedia(Media $media)
@@ -123,7 +134,7 @@ class MediaCategory
     /**
      * @param Media $media
      */
-    public function removeMedia(Media $media)
+    public function removeMedion(Media $media)
     {
         $this->media->removeElement($media);
     }

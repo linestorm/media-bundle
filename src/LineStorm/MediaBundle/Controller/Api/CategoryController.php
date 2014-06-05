@@ -10,6 +10,7 @@ use LineStorm\MediaBundle\Model\MediaCategory;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -159,7 +160,7 @@ class CategoryController extends AbstractApiController implements ClassResourceI
 
         $node = $request->query->get('id', null);
         $to = $request->query->get('to', null);
-
+        $excludeNodes = $request->query->get('exclude', array());
 
         if(is_numeric($node))
         {
@@ -202,7 +203,7 @@ class CategoryController extends AbstractApiController implements ClassResourceI
             {
                 $id = $rTree[$i];
                 $n = $i+1;
-                $qb->leftJoin("m{$i}.children", "m{$n}")->addSelect("m{$n}");
+                $qb->leftJoin("m{$i}.children", "m{$n}", Expr\Join::WITH, "m{$n}.id NOT IN (:ids)")->setParameter('ids', $excludeNodes)->addSelect("m{$n}");
             }
 
             $qb->where('m0.parent IS NULL');
@@ -210,8 +211,10 @@ class CategoryController extends AbstractApiController implements ClassResourceI
         }
         else
         {
-            $qb = $entity->createQueryBuilder('m');
-            $qb->where('m.parent IS NULL');
+            $qb = $entity->createQueryBuilder('m0')
+                ->join('m0.children', 'c')->addSelect('c')
+                ->where('m0.parent IS NULL')
+                ->andwhere('m0.id NOT IN (:ids)')->setParameter('ids', $excludeNodes);
         }
 
         $categories = $qb->getQuery()->getArrayResult();
@@ -272,8 +275,9 @@ class CategoryController extends AbstractApiController implements ClassResourceI
     /**
      * Save a Category
      *
-     * @return Response
      * @throws AccessDeniedException
+     * @throws BadRequestHttpException
+     * @return Response
      *
      * [POST] /api/media/categories.{_format}
      */
@@ -285,32 +289,49 @@ class CategoryController extends AbstractApiController implements ClassResourceI
             throw new AccessDeniedException();
         }
 
+        $mediaManager = $this->get('linestorm.cms.media_manager');
+        $provider = $mediaManager->getDefaultProviderInstance();
         $modelManager = $this->getModelManager();
 
+        // linestorm_cms_form_media_category
         $request = $this->getRequest();
-        $form    = $this->getForm();
+        $form    = $this->createForm($this->formName);
 
-        $formValues = json_decode($request->getContent(), true);
+        $payload = json_decode($request->getContent(), true);
 
-        $form->submit($formValues[$this->formName]);
+        $formValues = $payload[$this->formName];
+
+        // clean up the indexes
+        if(array_key_exists('media', $formValues))
+        {
+            $formValues['media'] = array_values($formValues['media']);
+        }
+        $form->submit($formValues);
 
         if($form->isValid())
         {
-
             $em  = $modelManager->getManager();
-            $now = new \DateTime();
 
-            /** @var MediaCategory $category */
-            $category = $form->getData();
-            //$category->setCreatedOn($now);
-            //$category->setEditedOn($now);
+            /** @var MediaCategory $updatedCategory */
+            $updatedCategory = $form->getData();
 
-            $em->persist($category);
+            // force update the category
+            $medias = $updatedCategory->getMedia();
+            foreach($medias as $media)
+            {
+                $media->setCategory($updatedCategory);
+                $provider->store($media);
+                $provider->resize($media);
+            }
+
+            if($updatedCategory === $updatedCategory->getParent())
+            {
+                throw new BadRequestHttpException("You cannot make a category a parent of itself");
+            }
+            $em->persist($updatedCategory);
             $em->flush();
 
-            $view = View::create($category, 201, array(
-                'location' => $this->generateUrl('linestorm_cms_module_media_api_get_category', array('id' => $category->getId()))
-            ));
+            $view = $this->createResponse(array('location' => $this->generateUrl('linestorm_cms_module_media_api_get_category', array('id' => $updatedCategory->getId()))), 200);
         }
         else
         {
@@ -325,9 +346,10 @@ class CategoryController extends AbstractApiController implements ClassResourceI
      *
      * @param $id
      *
-     * @return Response
      * @throws AccessDeniedException
+     * @throws BadRequestHttpException
      * @throws NotFoundHttpException
+     * @return Response
      *
      * [PUT] /api/media/categories/{id}.{_format}
      */
@@ -340,6 +362,8 @@ class CategoryController extends AbstractApiController implements ClassResourceI
             throw new AccessDeniedException();
         }
 
+        $mediaManager = $this->get('linestorm.cms.media_manager');
+        $provider = $mediaManager->getDefaultProviderInstance();
         $modelManager = $this->getModelManager();
 
         $category = $modelManager->get('media_category')->find($id);
@@ -348,22 +372,41 @@ class CategoryController extends AbstractApiController implements ClassResourceI
             throw $this->createNotFoundException("Category not found");
         }
 
+        // linestorm_cms_form_media_category
         $request = $this->getRequest();
         $form    = $this->getForm($category);
 
-        $formValues = json_decode($request->getContent(), true);
+        $payload = json_decode($request->getContent(), true);
 
-        $form->submit($formValues[$this->formName]);
+        $formValues = $payload[$this->formName];
+
+        // clean up the indexes
+        if(array_key_exists('media', $formValues))
+        {
+            $formValues['media'] = array_values($formValues['media']);
+        }
+        $form->submit($formValues);
 
         if($form->isValid())
         {
             $em  = $modelManager->getManager();
-            $now = new \DateTime();
 
             /** @var MediaCategory $updatedCategory */
             $updatedCategory = $form->getData();
-            //$updatedCategory->setEditedOn($now);
 
+            // force update the category
+            $medias = $updatedCategory->getMedia();
+            foreach($medias as $media)
+            {
+                $media->setCategory($category);
+                $provider->store($media);
+                $provider->resize($media);
+            }
+
+            if($category === $updatedCategory->getParent())
+            {
+                throw new BadRequestHttpException("You cannot make a category a parent of itself");
+            }
             $em->persist($updatedCategory);
             $em->flush();
 
@@ -407,8 +450,11 @@ class CategoryController extends AbstractApiController implements ClassResourceI
 
         $em = $modelManager->getManager();
         $em->remove($category);
+        $em->flush();
 
-        $view = View::create(null);
+        $view = View::create(array(
+            'location' => $this->generateUrl('linestorm_cms_admin_module_media_view'),
+        ));
 
         return $this->get('fos_rest.view_handler')->handle($view);
     }
