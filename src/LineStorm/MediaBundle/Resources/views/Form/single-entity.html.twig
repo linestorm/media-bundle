@@ -1,0 +1,64 @@
+{% import _self as fn %}
+{% macro dzPreview(form) %}
+    {% spaceless %}
+        <div class="upload-tile">
+            <div class="upload-preview">
+                <div class="upload-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+                <img class="upload-image-thumbnail" data-dz-thumbnail src="{{ form.src.vars.value }}" />
+            </div>
+
+            <button type="button" class="btn btn-danger upload-remove" tabindex="-1" data-dz-remove><i class="fa-times"></i></button>
+
+            <div class="upload-form-container">
+                <div class="upload-form-item" id="{{ form.vars.id }}___name__">
+                    {{ form_widget(form.title, {attr: {placeholder: 'Title', class: 'upload-textarea'} }) }}
+                    {{ form_widget(form.alt, {attr: {placeholder: 'Alt Text', class: 'upload-input'} }) }}
+                    {{ form_widget(form.credits, {attr: {placeholder: 'Credits', class: 'upload-input'} }) }}
+
+                    {{ form_widget(form.src) }}
+                    {{ form_widget(form.path) }}
+                    {{ form_widget(form.hash) }}
+                    {{ form_widget(form.name) }}
+                    {{ form_widget(form.nameOriginal) }}
+                    {{ form_widget(form.category, {attr: {class: 'media-form-category'} }) }}
+                </div>
+                <p>
+
+                </p>
+            </div>
+        </div>
+    {% endspaceless %}
+{% endmacro %}
+
+<div class="row">
+    <div class="col-xs-12">
+        {% if init_node is not defined %}
+            {% set init_node = null %}
+        {% endif %}
+        {% if exclude_nodes is not defined %}
+            {% set exclude_nodes = null %}
+        {% endif %}
+        {% if input is not defined %}
+            {% set input = '.media-form-category' %}
+        {% endif %}
+        {{ include('LineStormMediaBundle:Form:mediatreebrowser.html.twig', {
+            url: url('linestorm_cms_module_media_api_get_category_tree'),
+            init_node: init_node,
+            exclude_nodes: exclude_nodes,
+            input: input
+        }) }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="dropzone"
+             data-url="{{ path('linestorm_cms_admin_module_media_upload') }}"
+             data-prototype="{{ fn.dzPreview(form)|e('html_attr') }}">
+            <!-- dropzone -->
+            {% if form.vars.value %}
+                {{ fn.dzPreview(form) }}
+            {% endif %}
+        </div>
+    </div>
+</div>
