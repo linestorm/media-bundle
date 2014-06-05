@@ -94,8 +94,8 @@ class MediaController extends Controller
         $provider     = $mediaManager->getDefaultProviderInstance();
         $class = $provider->getEntityClass();
 
-        $form = $this->createForm($provider->getForm(), new $class(), array(
-            'action' => $this->generateUrl('linestorm_cms_module_media_api_post_media'),
+        $form = $this->createForm('linestorm_cms_form_media_multiple', null, array(
+            'action' => $this->generateUrl('linestorm_cms_module_media_api_post_media_batch'),
             'method' => 'POST',
         ));
 
@@ -119,16 +119,17 @@ class MediaController extends Controller
             throw new AccessDeniedException();
         }
 
-
         $code = 201;
         try
         {
             $media = $this->doUpload();
-        } catch (MediaFileAlreadyExistsException $e)
+        }
+        catch (MediaFileAlreadyExistsException $e)
         {
             $media = $e->getEntity();
             $code  = 200;
-        } catch (\Exception $e)
+        }
+        catch (\Exception $e)
         {
             $view = View::create(array(
                 'error' => $e->getMessage(),
@@ -136,10 +137,10 @@ class MediaController extends Controller
             $view->setFormat('json');
 
             return $this->get('fos_rest.view_handler')->handle($view);
-        }
+        };
 
         $api = array(
-            'edit' => $this->generateUrl('linestorm_cms_module_media_api_put_media', array('id' => $media->getId())),
+            'create' => $this->generateUrl('linestorm_cms_module_media_api_post_media'),
         );
         $doc = new \LineStorm\MediaBundle\Document\Media($media, $api);
         $view = View::create($doc, $code);
@@ -224,7 +225,7 @@ class MediaController extends Controller
 
             if ($file->isValid())
             {
-                $media = $mediaManager->store($file, $entity);
+                $media = $mediaManager->upload($file, $entity);
 
                 if (!($media instanceof Media))
                 {

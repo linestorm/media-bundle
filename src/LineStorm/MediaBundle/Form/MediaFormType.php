@@ -48,6 +48,9 @@ class MediaFormType extends AbstractType
             ->add('alt')
             ->add('src', 'hidden')
             ->add('hash', 'hidden')
+            ->add('name', 'hidden')
+            ->add('nameOriginal', 'hidden')
+            ->add('path', 'hidden')
         ;
 
         $transformer = new MediaTransformer($this->mediaManager);

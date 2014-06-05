@@ -59,13 +59,23 @@ interface MediaProviderInterface
 
     /**
      * Store an image in the storeage
-     *
-     * @param File  $file
+
      * @param Media $media
      *
      * @return Media
      */
-    public function store(File $file, Media $media = null);
+    public function store(Media $media);
+
+    /**
+     * Upload a file, return a media object
+     * NOTE THAT THE RETURNED MEDIA OBJECT IS NOT PERSISTED
+     *
+     * @param File  $file
+     * @param Media $media
+     *
+     * @return mixed
+     */
+    public function upload(File $file, Media $media = null);
 
     /**
      * Update an image in storage

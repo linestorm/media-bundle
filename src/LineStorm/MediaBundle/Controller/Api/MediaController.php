@@ -9,6 +9,7 @@ use LineStorm\MediaBundle\Document\Media as MediaDocument;
 use LineStorm\MediaBundle\Model\Media;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -20,6 +21,7 @@ use Symfony\Component\Validator\Exception\ValidatorException;
  * Class MediaController
  *
  * @package LineStorm\MediaBundle\Controller\Api
+ * @author  Andy Thorne <contrabandvr@gmail.com>
  */
 class MediaController extends AbstractApiController implements ClassResourceInterface
 {
@@ -291,6 +293,64 @@ class MediaController extends AbstractApiController implements ClassResourceInte
     }
 
     // BATCH METHODS
+
+    /**
+     * Create a batch of media entities
+     *
+     * @throws AccessDeniedException
+     * @throws BadRequestHttpException
+     * @return Response
+     *
+     * [POST] /blog/api/media/batches.{_format}
+     */
+    public function postBatchAction()
+    {
+        $user = $this->getUser();
+        if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        {
+            throw new AccessDeniedException();
+        }
+
+        $mediaManager = $this->get('linestorm.cms.media_manager');
+
+        $request = $this->getRequest();
+        $form    = $this->createForm('linestorm_cms_form_media_multiple');
+
+        $payload = json_decode($request->getContent(), true);
+
+        if(!array_key_exists('linestorm_cms_form_media_multiple', $payload))
+        {
+            throw new BadRequestHttpException("Expected form does not exist");
+        }
+
+        $form->submit($payload['linestorm_cms_form_media_multiple']);
+
+        if($form->isValid())
+        {
+            $updatedMedia = $form->getData();
+
+            /** @var Media $media */
+            foreach($updatedMedia['media'] as $media)
+            {
+                $media->setUploader($this->getUser());
+                $mediaManager->store($media);
+                $mediaManager->resize($media);
+            }
+
+            $view = $this->createResponse(array(
+                //'location' => $this->generateUrl('linestorm_cms_module_media_api_cate', array('id' => $form->getData()->getId()))
+            ), 200);
+        }
+        else
+        {
+            $view = $this->createResponse($form);
+        }
+
+
+        return $this->get('fos_rest.view_handler')->handle($view);
+
+    }
+
     /**
      * Batch put media
      *

@@ -40,6 +40,11 @@ class MediaCategoryFormType extends AbstractType
         $builder
             ->add('name')
             ->add('parent', 'mediatreebrowser')
+            ->add('media', 'collection', array(
+                'type' => new MediaFormType($this->mediaManager),
+                'allow_add' => true,
+                'allow_delete' => true
+            ))
         ;
     }
     

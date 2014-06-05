@@ -101,6 +101,7 @@ class Media
     public function setCategory(MediaCategory $category)
     {
         $this->category = $category;
+        $category->addMedia($this);
     }
 
     /**

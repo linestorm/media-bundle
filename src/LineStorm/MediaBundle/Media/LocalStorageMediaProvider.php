@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use LineStorm\MediaBundle\Media\Exception\MediaFileAlreadyExistsException;
 use LineStorm\MediaBundle\Media\Exception\MediaFileDeniedException;
+use LineStorm\MediaBundle\Media\Exception\MediaFileNotFoundException;
 use LineStorm\MediaBundle\Model\Media;
 use LineStorm\SearchBundle\Search\SearchProviderInterface;
 use Symfony\Component\HttpFoundation\File\File;
@@ -78,11 +79,11 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     protected $searchProvider;
 
     /**
-     * @param EntityManager           $em         The Entity Manager to use
-     * @param string                  $mediaClass The Entity class
-     * @param SecurityContext         $secutiryContext
-     * @param string                  $path
-     * @param string                  $src
+     * @param EntityManager   $em         The Entity Manager to use
+     * @param string          $mediaClass The Entity class
+     * @param SecurityContext $secutiryContext
+     * @param string          $path
+     * @param string          $src
      */
     function __construct(EntityManager $em, $mediaClass, SecurityContext $secutiryContext, $path, $src)
     {
@@ -97,6 +98,17 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
             $this->user = $token->getUser();
         }
     }
+
+    /**
+     * Set the entity manager
+     *
+     * @param EntityManager $em
+     */
+    public function setEntityManager(EntityManager $em)
+    {
+        $this->em = $em;
+    }
+
 
     /**
      * Return the entity class FQNS
@@ -115,7 +127,7 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
      */
     public function getCategoryEntityClass()
     {
-        return $this->class."Category";
+        return $this->class . "Category";
     }
 
     /**
@@ -155,15 +167,38 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     /**
      * @inheritdoc
      */
-    public function store(File $file, Media $media = null)
+    public function store(Media $media)
     {
-        $hash   = sha1_file($file->getPathname());
-        $entity = $this->findByHash($hash);
-        if($entity instanceof Media)
+        if(!file_exists($media->getPath()))
         {
-            throw new MediaFileAlreadyExistsException($entity);
+            throw new MediaFileNotFoundException($media->getPath());
         }
 
+        if(!$media->getUploader() && $this->user instanceof UserInterface)
+        {
+            $media->setUploader($this->user);
+        }
+
+        $this->em->persist($media);
+        $this->em->flush($media);
+
+        // index the media object
+        $this->searchProvider->index($media);
+
+        return $media;
+    }
+
+    /**
+     * Upload a file, storing it in the temporary
+     *
+     * @param File  $file
+     * @param Media $media
+     *
+     * @throws Exception\MediaFileDeniedException
+     * @return Media
+     */
+    public function upload(File $file, Media $media = null)
+    {
         if(!($media instanceof Media))
         {
             $media = new $this->class();
@@ -189,13 +224,19 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
             if($media->getName())
             {
                 if($media->getPath() != $file->getPathname()) // if it's already in place, we don't need to move it!
+                {
                     $newFileName = $media->getName();
+                }
             }
             else
+            {
                 $newFileName = md5(time() . rand()) . "." . $extension;
+            }
 
             if($newFileName)
+            {
                 $file = $file->move($this->storePath, $newFileName);
+            }
         }
         else
         {
@@ -213,32 +254,31 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
             $oldPath = pathinfo($oldName);
 
             if(!$media->getNameOriginal())
+            {
                 $media->setNameOriginal($oldName);
+            }
 
             if(!$media->getName())
+            {
                 $media->setName($file->getFilename());
-
-            if(!$media->getUploader())
-                $media->setUploader($this->user);
+            }
 
             if(!$media->getAlt())
+            {
                 $media->setAlt($oldPath['filename']);
+            }
 
             if(!$media->getCredits())
+            {
                 $media->setCredits($this->user->getUsername());
+            }
 
             $media->setSrc($this->storeDirectory . $file->getFilename());
             $media->setPath($this->storePath . $file->getFilename());
             $media->setHash(sha1_file($file->getPathname()));
-
-            $this->em->persist($media);
-            $this->em->flush($media);
-
-            // index the media object
-            $this->searchProvider->index($media);
-
-            return $media;
         }
+
+        return $media;
     }
 
     /**
@@ -246,12 +286,11 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
      */
     public function update(Media $media)
     {
-
         // index the media object
         $this->searchProvider->index($media);
 
         $this->em->persist($media);
-        $this->em->flush($media);
+        $this->em->flush();
 
         return $media;
     }
@@ -263,7 +302,9 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     {
         $file = $media->getPath();
         if($media->getSrc() && file_exists($file) && is_file($file))
+        {
             unlink($file);
+        }
 
 
         // index the media object
@@ -343,8 +384,11 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
 
             try
             {
-                return $this->store($file, $resizedMedia);
-            } catch(MediaFileAlreadyExistsException $e)
+                $entity = $this->upload($file, $resizedMedia);
+
+                return $this->store($entity);
+            }
+            catch(MediaFileAlreadyExistsException $e)
             {
                 return $e->getEntity();
             }

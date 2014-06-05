@@ -1,5 +1,5 @@
 
-define(['jquery', 'bootstrap', 'dropzone', 'typeahead', 'cms_api'], function ($, bs, Dropzone, typeahead, api) {
+define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api'], function ($, jui, bs, Dropzone, typeahead, api) {
 
     // setup dropzone
     Dropzone.autoDiscover = false;
@@ -9,8 +9,10 @@ define(['jquery', 'bootstrap', 'dropzone', 'typeahead', 'cms_api'], function ($,
     var carrosselDropZone;
 
     $(document).ready(function(){
-        $form = $('form[name="linestorm_cms_form_media"]');
+        $form = $('form[name="linestorm_cms_form_media"],form[name="linestorm_cms_form_media_category"]');
         $dropzone = $('.dropzone');
+
+        var formCount = parseInt($form.data('count')) || 0;
 
         if($dropzone.length){
             carrosselDropZone = new Dropzone($dropzone[0], {
@@ -21,11 +23,20 @@ define(['jquery', 'bootstrap', 'dropzone', 'typeahead', 'cms_api'], function ($,
                 init: function(){
                     this.on("success", function(file, response) {
                         var $form = $(file.previewElement);
-                        $form.find('input[name*="[alt]"]').val(response.alt);
-                        $form.find('input[name*="[src]"]').val(response.src);
-                        $form.find('input[name*="[hash]"]').val(response.hash);
-                        $form.find('input[name*="[credits]"]').val(response.credits);
-                        $form.find('textarea[name*="[title]"]').val(response.title);
+
+                        var $container = $form.find('.upload-form-container');
+                        $container.html($container.html().replace(/__name__/g, formCount));
+                        ++formCount;
+
+                        $container.find('input[name*="[alt]"]').val(response.alt);
+                        $container.find('input[name*="[hash]"]').val(response.hash);
+                        $container.find('input[name*="[credits]"]').val(response.credits);
+                        $container.find('textarea[name*="[title]"]').val(response.title);
+
+                        $container.find('input[name*="[src]"]').val(response.src);
+                        $container.find('input[name*="[path]"]').val(response.path);
+                        $container.find('input[name*="[name]"]').val(response.name);
+                        $container.find('input[name*="[nameOriginal]"]').val(response.name_original);
                     });
                     this.on("error", function(file, response) {
                         this.removeFile(file);
@@ -35,16 +46,14 @@ define(['jquery', 'bootstrap', 'dropzone', 'typeahead', 'cms_api'], function ($,
                 previewTemplate: $dropzone.data('prototype')
             });
 
-            $('.media-api-save').on('click', function(e){
+            $('form[name="linestorm_cms_form_media_multiple"]').on('submit', function(e){
                 e.preventDefault();
                 e.stopPropagation();
 
-                var forms = $('form[name="linestorm_cms_form_media"]');
-                window.lineStorm.api.saveForm(forms, function(on, status, xhr){
-                    if(xhr.status === 200){
-                    } else if(xhr.status === 201) {
-                    } else {
-                    }
+                var $form = $(this),
+                    $mediaItems = $form.find('.upload-tile');
+                window.lineStorm.api.saveForm($form, function(on, status, xhr){
+                    $mediaItems.remove();
                 }, function(e, status, ex){
                     if(e.status === 400){
                         if(e.responseJSON){
@@ -56,6 +65,25 @@ define(['jquery', 'bootstrap', 'dropzone', 'typeahead', 'cms_api'], function ($,
 
                 return false;
             });
+
+            // dropzone doesn't bind the delete buttons if they were present before init (e.g. on edit pages)
+            $dropzone.find('.upload-remove').on('click', function(){
+                $(this).closest('.upload-tile').remove();
+            })
+
+            // set up the sortable content
+            $dropzone.sortable({
+                items: '> .upload-tile',
+                create: function( event, ui ) {
+                },
+                start: function(e, ui){
+
+                },
+                stop:function(e,ui){
+
+                }
+            });
+            $dropzone.disableSelection();
         }
 
         $('form.api-save').on('submit', function(e){
