@@ -46,6 +46,9 @@ In order to satisfy MediaProviderInterface, we must implement a few basic method
 * findByHash
 * store
 * update
+* delete
+* upload
+* resize
 
 We do not need to worry about getId and getForm as they are inherited from AbstractMediaProvider and return $id and
 $form. If you don't want or need to use the FormType as a service, overridge the getForm implementation.
@@ -67,7 +70,7 @@ Lets continue and add our find, findBy and findByHash methods:
      */
     public function findByHash($hash)
     {
-        // search the api via an image hash. This will block duplicate images. return null to allow duplicate images.
+        // search the api via an image hash. This could block duplicate images. return null to allow duplicate images.
         return $this->api->findOneBy(array('hash' => $hash));
     }
 
@@ -81,4 +84,7 @@ Lets continue and add our find, findBy and findByHash methods:
     }
 ```
 
-Lastly, we want to implement store and update.
+Lastly, we want to implement the CRUD methods (`store`, `update`, `delete`). These methods should handle committing changes to
+the database (or API/however you store the media)
+
+`resize` takes a file parameter and will resize the media on upload.

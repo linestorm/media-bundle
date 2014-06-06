@@ -1,14 +1,12 @@
-Post Module for LineStorm Blog Bundle
-========================================
+Media Module Bundle for LineStorm CMS
+=====================================
 
 [![Build Status](https://travis-ci.org/linestorm/media-bundle.svg?branch=master)](https://travis-ci.org/linestorm/media-bundle)
 
-Post Module for the LineStorm BlogBundle. It comes bundled with the Tag, Article and Gallery components. It also requires
-the `linestorm/media-bundle`.
+The Media Module Bundle for LineStorm CMS provides image management for the CMS
 
 Installation
 ============
-This module will provide functionality to post blog type content to the LineStorm CMS.
 
 1. Download bundle using composer
 2. Enable the Bundle
@@ -43,15 +41,15 @@ public function registerBundles()
 Step 3: Configure the Bundle
 ----------------------------
 
-Add the default media provider in the linestorm_cms_media namespace inside the `app/config/config.yml` file. The default
-is local_storeage
+Add the default media provider in the `linestorm_cms_media` namespace inside the `app/config/config.yml` file. The default
+is `local_storeage`
 
 ```yml
 line_storm_media:
   default_provider: local_storeage
 ```
 
-If you want to use local_storage, you will need to add it to your `Resources/config/services.yml` file:
+If you want to use `local_storage`, you will need to add it to your `Resources/config/services.yml` file:
 
 ```yml
 parameters:
@@ -64,8 +62,8 @@ services:
             - @doctrine.orm.default_entity_manager
             - %linestorm.cms.media_provider.local_storeage.entity.class%
             - @security.context
-            - /path/to/web/media/
-            - /media/
+            - /path/to/store/directory/
+            - /web/path/
         tags:
             - { name: linestorm.cms.media_provider }
 ```

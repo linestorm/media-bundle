@@ -2,8 +2,11 @@
 
 namespace LineStorm\MediaBundle\Tests\Media;
 
+use Doctrine\ORM\EntityManager;
 use LineStorm\MediaBundle\Media\LocalStorageMediaProvider;
 use LineStorm\MediaBundle\Media\MediaProviderInterface;
+use LineStorm\MediaBundle\Media\MediaResizer;
+use LineStorm\MediaBundle\Tests\Fixtures\Entity\MediaEntity;
 use LineStorm\MediaBundle\Tests\Fixtures\User\FakeAdminUser;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -21,9 +24,23 @@ class LocalStorageMediaProviderTest extends AbstractMediaProviderTest
     protected $form = 'linestorm_cms_form_media';
     protected $dir;
 
+    /**
+     * @var FakeAdminUser
+     */
+    protected $user;
+
+    /**
+     * @var EntityManager
+     */
+    protected $em;
+
     protected function setUp()
     {
-        $this->dir =  __DIR__."/../Fixtures/tmp";
+        $this->dir = __DIR__."/../Fixtures/tmp";
+        $this->user = new FakeAdminUser();
+
+        if(!file_exists($this->dir))
+            @mkdir($this->dir, 0777, true);
 
         parent::setUp();
     }
@@ -48,22 +65,22 @@ class LocalStorageMediaProviderTest extends AbstractMediaProviderTest
     protected function getProvider($repository = null)
     {
         $entityClass = '\LineStorm\MediaBundle\Tests\Fixtures\Entity\MediaEntity';
-        $em = $this->getMock('\Doctrine\ORM\EntityManager', array('getRepository', 'persist', 'flush'), array(), '', false);
+        $this->em = $this->getMock('\Doctrine\ORM\EntityManager', array('getRepository', 'persist', 'flush'), array(), '', false);
         $sc = $this->getMock('\Symfony\Component\Security\Core\SecurityContext', array('getToken'), array(), '', false);
 
-        $token = new UsernamePasswordToken(new FakeAdminUser(), 'unittest', 'unittest');
+        $token = new UsernamePasswordToken($this->user, 'unittest', 'unittest');
         $sc->expects($this->any())
             ->method('getToken')
             ->will($this->returnValue($token));
 
         if($repository)
         {
-            $em->expects($this->once())
+            $this->em->expects($this->once())
                 ->method('getRepository')
                 ->will($this->returnValue($repository));
         }
 
-        return new LocalStorageMediaProvider($em, $entityClass, $sc, $this->dir, '/web/');
+        return new LocalStorageMediaProvider($this->em, $entityClass, $sc, $this->dir, '/');
     }
 
 
@@ -165,5 +182,42 @@ class LocalStorageMediaProviderTest extends AbstractMediaProviderTest
         $this->assertInstanceOf('\LineStorm\MediaBundle\Tests\Fixtures\User\FakeAdminUser', $uploader);
 
         unlink($this->dir.$returnedMedia->getSrc());
+    }
+
+    public function testResize()
+    {
+        $entityClass = '\LineStorm\MediaBundle\Tests\Fixtures\Entity\MediaEntity';
+
+        $repository = $this->getMock('\Doctrine\ORM\EntityRepository', array('findOneBy'), array(), '', false);
+        $repository->expects($this->once())
+            ->method('findOneBy')
+            ->will($this->returnValue(null));
+
+        $provider = $this->getProvider($repository);
+
+        $resizer = new MediaResizer('20x20', $this->em, 20, 20);
+        $provider->addMediaResizer($resizer);
+
+        $entity = new MediaEntity();
+
+        $img = __DIR__.'/../Fixtures/Images/valid.gif';
+        $tmpImg = $this->dir.'/resize_valid.gif';
+        copy($img, $tmpImg);
+
+        $entity->setPath($tmpImg);
+        $entity->setUploader($this->user);
+
+        $resized = $provider->resize($entity);
+
+        $this->assertTrue(is_array($resized));
+        $this->assertCount(1, $resized);
+        $this->assertArrayHasKey(0, $resized);
+
+        /** @var MediaEntity $resizedEntity */
+        $resizedEntity = $resized[0];
+
+        $dir = str_replace('/', '\/', realpath($this->dir));
+        $this->assertRegExp('/'.$dir.'\/resize_valid_(\d+)_x_(\d+)\.gif$/', realpath($resizedEntity->getPath()));
+
     }
 }

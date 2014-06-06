@@ -362,54 +362,23 @@ class MediaController extends AbstractApiController implements ClassResourceInte
     public function putBatchAction($id)
     {
         $user = $this->getUser();
-        if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
             throw new AccessDeniedException();
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
 
-        $provider = $this->getRequest()->query->get('p', null);
+        $provider     = $mediaManager->getDefaultProviderInstance();
 
-        $image = $mediaManager->find($id, $provider);
+        $form = $this->createForm('linestorm_cms_form_media_multiple', null, array(
+            'action' => $this->generateUrl('linestorm_cms_module_media_api_post_media'),
+            'method' => 'POST',
+        ));
 
-        $request = $this->getRequest();
-        $form    = $this->getForm($image);
-
-        $payload = json_decode($request->getContent(), true);
-
-        $entities = array();
-        try
-        {
-            foreach($payload as $formData)
-            {
-                $form->submit($formData['linestorm_cms_form_media']);
-
-                if($form->isValid())
-                {
-                    /** @var Media $updatedMedia */
-                    $entities[] = $form->getData();
-                }
-                else
-                {
-                    throw new ValidatorException();
-                }
-            }
-
-            foreach($entities as $entity)
-            {
-                $mediaManager->update($entity);
-                $mediaManager->resize($entity);
-            }
-
-            $view = $this->createResponse(array(), 200);
-        }
-        catch(ValidatorException $e)
-        {
-            $view = View::create($form);
-        }
-
-        return $this->get('fos_rest.view_handler')->handle($view);
+        return $this->render('LineStormMediaBundle:Form:multiple.html.twig', array(
+            'form'  => $form->createView(),
+        ));
     }
 
     /**
