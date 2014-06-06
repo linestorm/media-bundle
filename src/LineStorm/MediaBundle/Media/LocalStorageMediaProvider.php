@@ -228,7 +228,10 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
             $this->em->flush($media);
 
             // index the media object
-            $this->searchProvider->index($media);
+            if($this->searchProvider instanceof SearchProviderInterface)
+            {
+                $this->searchProvider->index($media);
+            }
 
             return $media;
         }
@@ -303,7 +306,6 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     protected function resizeImage(Media $media, MediaResizer $resizer)
     {
         $imagePath = pathinfo($media->getPath());
-        $imageSrc  = pathinfo($media->getSrc());
 
         $image = new ImageResize($media->getPath());
 
