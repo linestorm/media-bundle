@@ -276,7 +276,6 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
             $media->setSrc($this->storeDirectory . $file->getFilename());
             $media->setPath($this->storePath . $file->getFilename());
             $media->setHash(sha1_file($file->getPathname()));
-git add
         }
 
         return $media;

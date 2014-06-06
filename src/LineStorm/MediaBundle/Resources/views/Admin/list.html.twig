@@ -1,4 +1,4 @@
-{% extends 'LineStormCmsBundle:Admin:index.html.twig' %}
+{% extends 'LineStormMediaBundle::layout.html.twig' %}
 
 {% block page_title %}View All Media{% endblock %}
 
@@ -22,29 +22,40 @@
 {% block module %}
 
 
-    <div class="row padd">
-        <div class="col-xs-12">
-            <button class="btn btn-primary media-edit">
-                <i class="fa-pencil"></i> Edit Selected
-            </button>
+    <div class="form-group">
+        <button class="btn btn-default media-edit">
+            <i class="fa-pencil"></i> Edit Selected
+        </button>
 
-            <a href="{{ url('linestorm_cms_admin_module_media_create') }}" class="btn btn-primary media-new">
-                <i class="fa-picture-o"></i> New Media
-            </a>
+        <a href="{{ url('linestorm_cms_admin_module_media_create') }}" class="btn btn-default media-new">
+            <i class="fa-picture-o"></i> New Media
+        </a>
 
-            <a href="{{ url('linestorm_cms_admin_module_media_category_create') }}" class="btn btn-primary media-category-new">
-                <i class="fa-folder-o"></i> New Category
-            </a>
-        </div>
+        <a href="{{ url('linestorm_cms_admin_module_media_category_create') }}" class="btn btn-default media-category-new">
+            <i class="fa-folder-o"></i> New Category
+        </a>
     </div>
 
-    <div class="row">
-        <div class="col-xs-12">
-            {{ include('LineStormMediaBundle:Form:mediatreebrowser.html.twig', {
-                url: url('linestorm_cms_module_media_api_get_category_mediatree'),
-                input: '.media-form-category'
-            }) }}
-        </div>
+    <div class="form-group">
+        {{ include('LineStormMediaBundle:Form:mediatreebrowser.html.twig', {
+            url: url('linestorm_cms_module_media_api_get_category_mediatree'),
+            input: '.media-form-category'
+        }) }}
+    </div>
+
+
+    <div class="form-group">
+        <button class="btn btn-default media-edit">
+            <i class="fa-pencil"></i> Edit Selected
+        </button>
+
+        <a href="{{ url('linestorm_cms_admin_module_media_create') }}" class="btn btn-default media-new">
+            <i class="fa-picture-o"></i> New Media
+        </a>
+
+        <a href="{{ url('linestorm_cms_admin_module_media_category_create') }}" class="btn btn-default media-category-new">
+            <i class="fa-folder-o"></i> New Category
+        </a>
     </div>
 
 {% endblock %}

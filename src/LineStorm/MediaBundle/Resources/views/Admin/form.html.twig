@@ -1,4 +1,4 @@
-{% extends 'LineStormCmsBundle:Admin:layout.html.twig' %}
+{% extends 'LineStormMediaBundle::layout.html.twig' %}
 
 {% block head %}
     {% block requirejs %}
@@ -18,17 +18,5 @@
 {% endblock %}
 
 {% block module %}
-
-    {{ form_start(form) }}
-
-        {% include 'LineStormMediaBundle:Form:multiple.html.twig' %}
-
-        <div class="row">
-            <div class="col-xs-12">
-                <button type="submit" class="btn btn-primary media-api-save">
-                    <i class="fa-save"></i> Save
-                </button>
-            </div>
-        </div>
-    {{ form_end(form) }}
+    {% include 'LineStormMediaBundle:Form:form-multiple.html.twig' %}
 {% endblock %}

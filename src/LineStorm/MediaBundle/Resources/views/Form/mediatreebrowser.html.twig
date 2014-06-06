@@ -1,9 +1,4 @@
-{{
-    include('LineStormCmsBundle::requirejs.html.twig', {
-        requirejs_module: ['cms_media_treebrowser']
-    })
-}}
-<div id="media-tree"
+<div class="media-tree {% if class is defined %}{{ class }}{% else %}compact{% endif %}"
      data-root="{{ url }}"
      data-init="{% if init_node is defined %}{{ init_node }}{% endif %}"
      data-input="{% if input is defined %}{{ input }}{% endif %}"

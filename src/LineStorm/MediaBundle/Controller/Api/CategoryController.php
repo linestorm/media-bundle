@@ -164,8 +164,9 @@ class CategoryController extends AbstractApiController implements ClassResourceI
 
         if(is_numeric($node))
         {
-            $qb = $entity->createQueryBuilder('m');
-            $qb->join('m.parent', 'p')->where('p.id = ?1')->setParameter(1, $node);
+            $qb = $entity->createQueryBuilder('m')
+                ->leftJoin('m.children', 'c')->addSelect('c')
+                ->where('m.id = ?1')->setParameter(1, $node);
         }
         elseif(is_numeric($to))
         {
@@ -212,7 +213,7 @@ class CategoryController extends AbstractApiController implements ClassResourceI
         else
         {
             $qb = $entity->createQueryBuilder('m0')
-                ->join('m0.children', 'c')->addSelect('c')
+                ->leftJoin('m0.children', 'c')->addSelect('c')
                 ->where('m0.parent IS NULL')
                 ->andwhere('m0.id NOT IN (:ids)')->setParameter('ids', $excludeNodes);
         }
@@ -242,22 +243,18 @@ class CategoryController extends AbstractApiController implements ClassResourceI
 
         $node = $request->query->get('id', null);
 
+        $qb = $repo->createQueryBuilder('c')
+           ->leftJoin('c.media', 'm')
+           ->leftJoin('c.children', 'ch')
+           ->addSelect('m,ch');
+
         if(is_numeric($node))
         {
-            $qb = $repo->createQueryBuilder('c')
-                ->leftJoin('c.media', 'm')
-                ->addSelect('m')
-                ->join('c.parent', 'p')
-                ->where('p.id = ?1')
-                ->orWhere('(m.category = c AND c.id=?1)')
-                ->setParameter(1, $node);
+            $qb->where('c.id = ?1')->setParameter(1, $node);
         }
         else
         {
-            $qb = $repo->createQueryBuilder('c')
-                ->leftJoin('c.media', 'm')
-                ->addSelect('m')
-                ->where('c.parent IS NULL');
+            $qb->where('c.parent IS NULL');
         }
 
         $categories = $qb->getQuery()->getArrayResult();
@@ -265,6 +262,16 @@ class CategoryController extends AbstractApiController implements ClassResourceI
         foreach($categories as &$category)
         {
             $category['url'] = $this->generateUrl('linestorm_cms_admin_module_media_category_edit', array('id' => $category['id']));
+
+            foreach($category['media'] as &$media)
+            {
+                $media['url'] = $this->generateUrl('linestorm_cms_admin_module_media_edit', array('id' => $media['id']));
+            }
+
+            foreach($category['children'] as &$child)
+            {
+                $child['url'] = $this->generateUrl('linestorm_cms_admin_module_media_category_edit', array('id' => $child['id']));
+            }
         }
 
         $view = View::create($categories);

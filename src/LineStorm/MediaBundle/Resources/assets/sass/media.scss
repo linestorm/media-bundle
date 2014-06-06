@@ -21,6 +21,15 @@
   }
 }
 
+.media-tree {
+    height: 400px;
+    border: 1px solid #aaaaaa;
+    overflow: auto;
+
+    &.compact {
+        height: 200px;
+    }
+}
 
 
 .upload-tile {

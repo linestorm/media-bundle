@@ -43,6 +43,7 @@ abstract class Media extends BaseMedia
      * @var MediaCategory
      *
      * @ORM\ManyToOne(targetEntity="MediaCategory", inversedBy="media", cascade={"persist"})
+     * @ORM\JoinColumn(nullable=false)
      */
     protected $category;
 

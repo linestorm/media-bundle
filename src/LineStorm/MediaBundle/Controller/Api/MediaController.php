@@ -7,7 +7,9 @@ use FOS\RestBundle\View\View;
 use LineStorm\CmsBundle\Controller\Api\AbstractApiController;
 use LineStorm\MediaBundle\Document\Media as MediaDocument;
 use LineStorm\MediaBundle\Model\Media;
+use LineStorm\MediaBundle\Model\MediaCategory;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -166,6 +168,35 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         $view = View::create($images);
 
         return $this->get('fos_rest.view_handler')->handle($view);
+    }
+
+
+    public function newAction()
+    {
+        $user = $this->getUser();
+        if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        {
+            throw new AccessDeniedException();
+        }
+
+        $form = $this->createForm('linestorm_cms_form_media_multiple', null, array(
+            'action' => $this->generateUrl('linestorm_cms_module_media_api_post_media_batch'),
+            'method' => 'POST',
+        ));
+
+        $view = $form->createView();
+
+
+        $tpl  = $this->get('templating');
+        $form = $tpl->render('LineStormMediaBundle:Form:form-multiple.html.twig', array(
+            'form' => $view
+        ));
+
+        $rView = View::create(array(
+            'form' => $form
+        ));
+
+        return $this->get('fos_rest.view_handler')->handle($rView);
     }
 
     /**
@@ -328,6 +359,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         if($form->isValid())
         {
             $updatedMedia = $form->getData();
+            $mediaDocs = array();
 
             /** @var Media $media */
             foreach($updatedMedia['media'] as $media)
@@ -335,11 +367,11 @@ class MediaController extends AbstractApiController implements ClassResourceInte
                 $media->setUploader($this->getUser());
                 $mediaManager->store($media);
                 $mediaManager->resize($media);
+
+                $mediaDocs[] = new MediaDocument($media);
             }
 
-            $view = $this->createResponse(array(
-                //'location' => $this->generateUrl('linestorm_cms_module_media_api_cate', array('id' => $form->getData()->getId()))
-            ), 200);
+            $view = $this->createResponse($mediaDocs, 200);
         }
         else
         {
@@ -381,6 +413,79 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         ));
     }
 
+
+    /**
+     * Get all media, given a tree and/or node list
+     *
+     * @param Request $request
+     *
+     * @return Response
+     * @throws NotFoundHttpException
+     *
+     * [GET] /api/media/tree/expanded.{_format}
+     */
+    public function getTreeExpandedAction(Request $request)
+    {
+        $nodes = $request->query->get('nodes', array());
+        $categories = $request->query->get('categories', array());
+
+        $modelManager = $this->getModelManager();
+        $repo = $modelManager->get('media');
+        $catRepo = $modelManager->get('media_category');
+
+        $nodeList = array();
+        if(is_array($nodes))
+        {
+            $qb = $repo->createQueryBuilder('m')
+                ->where('m.id IN (:ids)')->setParameter('ids', $nodes);
+
+            /** @var Media[] $nodes */
+            $nodes = $qb->getQuery()->getResult();
+            foreach($nodes as $node)
+            {
+                $nodeList[$node->getId()] = new MediaDocument($node);
+            }
+        }
+
+        if(is_array($categories))
+        {
+            $hasChildren = true;
+            while($hasChildren)
+            {
+                $qb = $catRepo->createQueryBuilder('c')
+                    ->leftJoin('c.media', 'm')->addSelect('m')
+                    ->leftJoin('c.children', 'ch')->addSelect('partial ch.{id}')
+                    ->where('c.id IN (:ids)')->setParameter('ids', $categories);
+
+                /** @var MediaCategory[] $catList */
+                $catList = $qb->getQuery()->getResult();
+                $categories = array(); // reset the id list
+                foreach($catList as $cat)
+                {
+                    foreach($cat->getMedia() as $node)
+                    {
+                        $nodeList[$node->getId()] = new MediaDocument($node);
+                    }
+
+                    foreach($cat->getChildren() as $child)
+                    {
+                        $categories[] = $child->getId();
+                    }
+                }
+
+                if(!count($categories))
+                {
+                    $hasChildren = false;
+                }
+            }
+
+        }
+
+        $view = View::create(array_values($nodeList));
+
+        return $this->get('fos_rest.view_handler')->handle($view);
+    }
+
     /**
      * Convert the media object to a document safe of the API
      *
@@ -397,15 +502,16 @@ class MediaController extends AbstractApiController implements ClassResourceInte
      * Get the form for the entity
      *
      * @param Media|null $entity
+     * @param array      $data
      *
      * @return Form
      */
-    private function getForm($entity = null)
+    private function getForm($entity = null, array $data = array())
     {
         $mediaManager = $this->get('linestorm.cms.media_manager');
         $provider     = $mediaManager->getDefaultProviderInstance();
 
-        return $this->createForm($provider->getForm(), $entity);
+        return $this->createForm($provider->getForm(), $entity, $data);
     }
 
 }

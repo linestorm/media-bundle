@@ -1,5 +1,5 @@
 
-define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api'], function ($, jui, bs, Dropzone, typeahead, api) {
+define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api', 'cms_media_dropzone', 'cms_media_treebrowser'], function ($, jui, bs, Dropzone, typeahead, api, mDz, mTree) {
 
     // setup dropzone
     Dropzone.autoDiscover = false;
@@ -14,77 +14,35 @@ define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api'], 
 
         var formCount = parseInt($form.data('count')) || 0;
 
+
         if($dropzone.length){
-            carrosselDropZone = new Dropzone($dropzone[0], {
-                url: $dropzone.data('url'),
-                acceptedFiles: 'image/*',
-                thumbnailWidth: null,
-                thumbnailHeight: null,
-                init: function(){
-                    this.on("success", function(file, response) {
-                        var $form = $(file.previewElement);
-
-                        var $container = $form.find('.upload-form-container');
-                        $container.html($container.html().replace(/__name__/g, formCount));
-                        ++formCount;
-
-                        $container.find('input[name*="[alt]"]').val(response.alt);
-                        $container.find('input[name*="[hash]"]').val(response.hash);
-                        $container.find('input[name*="[credits]"]').val(response.credits);
-                        $container.find('textarea[name*="[title]"]').val(response.title);
-
-                        $container.find('input[name*="[src]"]').val(response.src);
-                        $container.find('input[name*="[path]"]').val(response.path);
-                        $container.find('input[name*="[name]"]').val(response.name);
-                        $container.find('input[name*="[nameOriginal]"]').val(response.name_original);
-                    });
-                    this.on("error", function(file, response) {
-                        this.removeFile(file);
-                        alert("Cannot add file: "+response);
-                    });
-                },
-                previewTemplate: $dropzone.data('prototype')
+            mDz.dropzone($dropzone, {
+                max: 0
             });
+        }
 
-            $('form[name="linestorm_cms_form_media_multiple"]').on('submit', function(e){
-                e.preventDefault();
-                e.stopPropagation();
+        var $tree = $('.media-tree');
+        mTree.mediaTree($tree);
 
-                var $form = $(this),
-                    $mediaItems = $form.find('.upload-tile');
-                window.lineStorm.api.saveForm($form, function(on, status, xhr){
-                    $mediaItems.remove();
-                }, function(e, status, ex){
-                    if(e.status === 400){
-                        if(e.responseJSON){
-                        } else {
-                            alert(status);
-                        }
+        $('form[name="linestorm_cms_form_media_multiple"]').on('submit', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+
+            var $form = $(this),
+                $mediaItems = $form.find('.upload-tile');
+            window.lineStorm.api.saveForm($form, function(on, status, xhr){
+                $mediaItems.remove();
+            }, function(e, status, ex){
+                if(e.status === 400){
+                    if(e.responseJSON){
+                    } else {
+                        alert(status);
                     }
-                });
-
-                return false;
-            });
-
-            // dropzone doesn't bind the delete buttons if they were present before init (e.g. on edit pages)
-            $dropzone.find('.upload-remove').on('click', function(){
-                $(this).closest('.upload-tile').remove();
-            })
-
-            // set up the sortable content
-            $dropzone.sortable({
-                items: '> .upload-tile',
-                create: function( event, ui ) {
-                },
-                start: function(e, ui){
-
-                },
-                stop:function(e,ui){
-
                 }
             });
-            $dropzone.disableSelection();
-        }
+
+            return false;
+        });
 
         $('form.api-save').on('submit', function(e){
             e.preventDefault();
@@ -139,18 +97,6 @@ define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api'], 
                     success: function(o){
                         window.location.reload();
                     }
-                });
-            }
-        });
-
-        $('input.media-search').typeahead({
-            hint: true,
-            highlight: true,
-            minLength: 2
-        },{
-            source: function (query, process) {
-                return $.get('/my_search_url', { query: query }, function (data) {
-                    return process(data.options);
                 });
             }
         });
