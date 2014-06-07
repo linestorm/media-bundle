@@ -1,6 +1,6 @@
 <?php
 
-namespace LineStorm\MediaBundle\Controller;
+namespace LineStorm\MediaBundle\Controller\Admin;
 
 use FOS\RestBundle\View\View;
 use LineStorm\MediaBundle\Media\Exception\MediaFileAlreadyExistsException;
@@ -13,11 +13,11 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Class AdminController
+ * Class MediaController
  *
  * @package LineStorm\MediaBundle\Controller
  */
-class AdminController extends Controller
+class MediaController extends Controller
 {
 
     /**
@@ -92,9 +92,10 @@ class AdminController extends Controller
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
         $provider     = $mediaManager->getDefaultProviderInstance();
+        $class = $provider->getEntityClass();
 
-        $form = $this->createForm($provider->getForm(), null, array(
-            'action' => $this->generateUrl('linestorm_cms_module_media_api_post_media'),
+        $form = $this->createForm('linestorm_cms_form_media_multiple', null, array(
+            'action' => $this->generateUrl('linestorm_cms_module_media_api_post_media_batch'),
             'method' => 'POST',
         ));
 
@@ -118,16 +119,17 @@ class AdminController extends Controller
             throw new AccessDeniedException();
         }
 
-
         $code = 201;
         try
         {
             $media = $this->doUpload();
-        } catch (MediaFileAlreadyExistsException $e)
+        }
+        catch (MediaFileAlreadyExistsException $e)
         {
             $media = $e->getEntity();
             $code  = 200;
-        } catch (\Exception $e)
+        }
+        catch (\Exception $e)
         {
             $view = View::create(array(
                 'error' => $e->getMessage(),
@@ -135,10 +137,10 @@ class AdminController extends Controller
             $view->setFormat('json');
 
             return $this->get('fos_rest.view_handler')->handle($view);
-        }
+        };
 
         $api = array(
-            'edit' => $this->generateUrl('linestorm_cms_module_media_api_put_media', array('id' => $media->getId())),
+            'create' => $this->generateUrl('linestorm_cms_module_media_api_post_media'),
         );
         $doc = new \LineStorm\MediaBundle\Document\Media($media, $api);
         $view = View::create($doc, $code);
@@ -223,7 +225,7 @@ class AdminController extends Controller
 
             if ($file->isValid())
             {
-                $media = $mediaManager->store($file, $entity);
+                $media = $mediaManager->upload($file, $entity);
 
                 if (!($media instanceof Media))
                 {

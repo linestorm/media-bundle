@@ -1,20 +1,6 @@
-{% extends 'LineStormCmsBundle:Admin:index.html.twig' %}
+{% extends 'LineStormMediaBundle::layout.html.twig' %}
 
 {% block page_title %}View All Media{% endblock %}
-
-{% import _self as fn %}
-{% macro imageItem () %}
-    {% spaceless %}
-    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 ">
-        <a href="__id__/edit" class="thumbnail preview">
-            <img data-src="holder.js/100%x180" src="__src__">
-            <div class="caption">
-                <p>__title__</p>
-            </div>
-        </a>
-    </div>
-    {% endspaceless %}
-{% endmacro %}
 
 {% block head %}
     {% block requirejs %}
@@ -24,18 +10,52 @@
             })
         }}
     {% endblock %}
+
+    {% stylesheets
+        filter="compass" output="assets/bundles/linestormmedia/css/media.css"
+        "@LineStormMediaBundle/Resources/assets/sass/media.scss"
+    %}
+        <link rel="stylesheet" href="{{ asset_url }}" />
+    {% endstylesheets %}
 {% endblock %}
 
 {% block module %}
-    <ul class="pager pull-left">
-        <li><a class="media-prev" href="#">Previous</a></li>
-        <li><a class="media-next" href="#">Next</a></li>
-    </ul>
-    <div class="row media-container" data-prototype="{{ fn.imageItem()|e('html_attr') }}" data-url="{{ path('linestorm_cms_module_media_api_get_media_all') }}">
 
+
+    <div class="form-group">
+        <button class="btn btn-default media-edit">
+            <i class="fa-pencil"></i> Edit Selected
+        </button>
+
+        <a href="{{ url('linestorm_cms_admin_module_media_create') }}" class="btn btn-default media-new">
+            <i class="fa-picture-o"></i> New Media
+        </a>
+
+        <a href="{{ url('linestorm_cms_admin_module_media_category_create') }}" class="btn btn-default media-category-new">
+            <i class="fa-folder-o"></i> New Category
+        </a>
     </div>
-    <ul class="pager pull-left">
-        <li><a class="media-prev" href="#">Previous</a></li>
-        <li><a class="media-next" href="#">Next</a></li>
-    </ul>
+
+    <div class="form-group">
+        {{ include('LineStormMediaBundle:Form:mediatreebrowser.html.twig', {
+            url: url('linestorm_cms_module_media_api_get_category_mediatree'),
+            input: '.media-form-category'
+        }) }}
+    </div>
+
+
+    <div class="form-group">
+        <button class="btn btn-default media-edit">
+            <i class="fa-pencil"></i> Edit Selected
+        </button>
+
+        <a href="{{ url('linestorm_cms_admin_module_media_create') }}" class="btn btn-default media-new">
+            <i class="fa-picture-o"></i> New Media
+        </a>
+
+        <a href="{{ url('linestorm_cms_admin_module_media_category_create') }}" class="btn btn-default media-category-new">
+            <i class="fa-folder-o"></i> New Category
+        </a>
+    </div>
+
 {% endblock %}

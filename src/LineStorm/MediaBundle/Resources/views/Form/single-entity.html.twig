@@ -1,0 +1,27 @@
+
+<div class="form-group">
+        {{ form_label(form) }}
+    <div class="col-sm-10">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <div class="col-sm-12">
+                        <input type="text" placeholder="Search Media..." class="form-control media-search">
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <button type="button" class="btn btn-link new-media" data-url="{{ url('linestorm_cms_module_media_api_new_media') }}">
+                    <i class="fa-cloud-upload"></i> Upload Media
+                </button>
+            </div>
+        </div>
+
+        <div class="image-preview-container thumbnail">
+            <img src="{% if media %}{{ media.src }}{% endif %}" class="{{ form.vars.id }}_preview" />
+        </div>
+
+        {{ form_widget(form) }}
+
+    </div>
+</div>

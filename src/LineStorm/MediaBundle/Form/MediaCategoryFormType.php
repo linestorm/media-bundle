@@ -9,11 +9,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 /**
- * Class MediaFormType
+ * Class MediaCategoryFormType
  *
  * @package LineStorm\MediaBundle\Form
  */
-class MediaFormType extends AbstractType
+class MediaCategoryFormType extends AbstractType
 {
 
     /**
@@ -37,25 +37,15 @@ class MediaFormType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $defaultProvider = $this->mediaManager->getDefaultProviderInstance();
         $builder
-            ->add('title', 'textarea')
-            ->add('category', 'mediatreebrowser', array(
-                'class'    => $defaultProvider->getCategoryEntityClass(),
-                'property' => 'name',
+            ->add('name')
+            ->add('parent', 'mediatreebrowser')
+            ->add('media', 'collection', array(
+                'type' => new MediaFormType($this->mediaManager),
+                'allow_add' => true,
+                'allow_delete' => true
             ))
-            ->add('credits')
-            ->add('alt')
-            ->add('src', 'hidden')
-            ->add('hash', 'hidden')
-            ->add('name', 'hidden')
-            ->add('nameOriginal', 'hidden')
-            ->add('path', 'hidden')
         ;
-
-        $transformer = new MediaTransformer($this->mediaManager);
-
-        $builder->addModelTransformer($transformer);
     }
     
     /**
@@ -66,7 +56,7 @@ class MediaFormType extends AbstractType
         $defaultProvider = $this->mediaManager->getDefaultProviderInstance();
         $resolver->setDefaults(array(
             'label' => false,
-            'data_class' => $defaultProvider->getEntityClass()
+            'data_class' => $defaultProvider->getCategoryEntityClass()
         ));
     }
 
@@ -75,6 +65,6 @@ class MediaFormType extends AbstractType
      */
     public function getName()
     {
-        return 'linestorm_cms_form_media';
+        return 'linestorm_cms_form_media_category';
     }
 }

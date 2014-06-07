@@ -45,7 +45,6 @@ class MediaTransformer implements DataTransformerInterface
                 if($fetched instanceof Media)
                 {
                     $fetched->setTitle($data->getTitle());
-                    $fetched->setDescription($data->getDescription());
                     $fetched->setAlt($data->getAlt());
                     $fetched->setCredits($data->getCredits());
 

@@ -56,6 +56,9 @@ class ImageResize
      */
     public function saveImage($savePath, $imageQuality = "100", $download = false)
     {
+        if(!is_resource($this->newImage))
+            return;
+
         switch($this->ext)
         {
             case 'image/jpg':
@@ -108,6 +111,9 @@ class ImageResize
      */
     public function resizeTo($width, $height, $resizeOption = ImageResize::RESIZE_DEFAULT)
     {
+        if(!is_resource($this->newImage))
+            return;
+
         switch(strtolower($resizeOption))
         {
             case self::RESIZE_EXACT:
@@ -147,8 +153,11 @@ class ImageResize
                 break;
         }
 
-        $this->newImage = imagecreatetruecolor($this->resizeWidth, $this->resizeHeight);
-        imagecopyresampled($this->newImage, $this->image, 0, 0, 0, 0, $this->resizeWidth, $this->resizeHeight, $this->origWidth, $this->origHeight);
+        if($this->resizeWidth > 0 && $this->resizeHeight > 0)
+        {
+            $this->newImage = @imagecreatetruecolor(ceil($this->resizeWidth), ceil($this->resizeHeight));
+            @imagecopyresampled($this->newImage, $this->image, 0, 0, 0, 0, $this->resizeWidth, $this->resizeHeight, $this->origWidth, $this->origHeight);
+        }
     }
 
     /**

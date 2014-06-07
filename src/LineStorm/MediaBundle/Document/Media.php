@@ -47,12 +47,17 @@ class Media
     /**
      * @var string
      */
-    protected $description;
+    protected $src;
 
     /**
      * @var string
      */
-    protected $src;
+    protected $path;
+
+    /**
+     * @var int
+     */
+    protected $category;
 
     /**
      * @var array Array of all api urls
@@ -67,13 +72,14 @@ class Media
     {
         $this->alt          = $media->getAlt();
         $this->credits      = $media->getCredits();
-        $this->description  = $media->getDescription();
         $this->hash         = $media->getHash();
         $this->id           = $media->getId();
         $this->name         = $media->getName();
         $this->nameOriginal = $media->getNameOriginal();
         $this->src          = $media->getSrc();
         $this->title        = $media->getTitle();
+        $this->path         = $media->getPath();
+        $this->category     = $media->getCategory();
 
         $this->_api         = $api;
     }
@@ -93,15 +99,6 @@ class Media
     {
         return $this->credits;
     }
-
-    /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
     /**
      * @return string
      */
@@ -148,6 +145,22 @@ class Media
     public function getTitle()
     {
         return $this->title;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
     }
 
     /**

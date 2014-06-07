@@ -1,49 +1,21 @@
 
-define(['jquery', 'bootstrap', 'cms_api'], function ($, bs, api) {
-    var page = 1,
-        $container;
+define(['jquery', 'bootstrap', 'cms_api', 'cms_media_treebrowser'], function ($, bs, api, mTree) {
+    $(document).ready(function(){
 
-    function requestPage(){
-        $.ajax({
-            url: $container.data('url'),
-            data: {
-                page: page,
-                limit: 50
-            },
-            type: 'GET',
-            dataType: 'json',
-            success: function(o){
-                $container.empty();
-                var html = '';
-                for(var i in o){
-                    var media = o[i];
-                    var prototype = $container.data('prototype');
-                    for(var p in media){
-                        var prop = media[p];
-                        var rgx = new RegExp("__"+p+"__", "gim");
-                        prototype = prototype.replace(rgx, prop);
-                    }
-                    html += prototype;
+        var $tree = $('.media-tree');
+        mTree.mediaTree($tree);
+
+        $('.media-edit').on('click', function(){
+            var selected = $('.media-tree').jstree('get_selected', true);
+            for(var i=0 ; i<selected.length ; ++i){
+                var item = selected[i];
+                switch(item.type){
+                    case "default":
+                    case "file":
+                        window.location = item.original.url;
+                        break;
                 }
-
-                $container.append(html);
             }
         });
-    }
-
-    $(document).ready(function(){
-        $container = $('.media-container');
-
-        $('a.media-prev').on('click', function(){
-            if(page <= 0)
-                return;
-            --page;
-            requestPage();
-        });
-        $('a.media-next').on('click', function(){
-            ++page;
-            requestPage();
-        });
-        requestPage();
     });
 });

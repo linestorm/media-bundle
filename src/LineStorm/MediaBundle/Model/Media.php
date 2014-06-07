@@ -9,7 +9,7 @@ use JMS\Serializer\Annotation as JMS;
 
 /**
  * Class Media
- * @package LineStorm\CmsBundle\Model
+ * @package LineStorm\MediaBundle\Model
  */
 class Media
 {
@@ -30,6 +30,11 @@ class Media
     protected $name;
 
     /**
+     * @var MediaCategory
+     */
+    protected $category;
+
+    /**
      * @var string
      */
     protected $nameOriginal;
@@ -48,11 +53,6 @@ class Media
      * @var string
      */
     protected $credits;
-
-    /**
-     * @var string
-     */
-    protected $description;
 
     /**
      * @var string
@@ -93,6 +93,23 @@ class Media
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @param MediaCategory $category
+     */
+    public function setCategory(MediaCategory $category)
+    {
+        $this->category = $category;
+        $category->addMedia($this);
+    }
+
+    /**
+     * @return MediaCategory
+     */
+    public function getCategory()
+    {
+        return $this->category;
     }
 
     /**
@@ -158,22 +175,6 @@ class Media
     public function getCredits()
     {
         return $this->credits;
-    }
-
-    /**
-     * @param string $description
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
     }
 
     /**
