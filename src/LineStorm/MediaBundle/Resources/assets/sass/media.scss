@@ -36,9 +36,10 @@
     position: relative;
     border: 1px solid #cccccc;
     width: 270px;
-    height: 308px;
+    height: 309px;
     float: left;
     margin: 10px;
+    box-shadow: 0 0 20px #aaa !important;
 
     .upload-remove {
         position: absolute;
@@ -83,12 +84,16 @@
 
     .upload-form-container{
 
+        p {
+            padding: 1px 5px !important;
+        }
+
         input, textarea {
             color: #666666;
             border-right: none !important;
             border-left: none !important;
-            border-top: none !important;
-            border-bottom: 1px solid #cccccc !important;
+            border-bottom: none !important;
+            border-top: 1px solid #cccccc !important;
             width: 100%;
             padding: 5px;
         }

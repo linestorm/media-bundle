@@ -3,6 +3,9 @@
     //Main module definition.
     define(['jquery', 'jqueryui', 'dropzone'], function($, ui, Dropzone){
 
+        // setup dropzone
+        Dropzone.autoDiscover = false;
+
         return {
             load: function (name, req, onload, config) {
                 //req has the same API as require().

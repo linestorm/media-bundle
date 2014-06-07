@@ -30,7 +30,7 @@ define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api', '
 
             var $form = $(this),
                 $mediaItems = $form.find('.upload-tile');
-            window.lineStorm.api.saveForm($form, function(on, status, xhr){
+            api.saveForm($form, function(on, status, xhr){
                 $mediaItems.remove();
             }, function(e, status, ex){
                 if(e.status === 400){
@@ -48,7 +48,7 @@ define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api', '
             e.preventDefault();
             e.stopPropagation();
 
-            window.lineStorm.api.saveForm($(this), function(on, status, xhr){
+            api.saveForm($(this), function(on, status, xhr){
                 if(xhr.status === 200){
                 } else if(xhr.status === 201) {
                 } else {
@@ -67,7 +67,7 @@ define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api', '
 
         $('.media-form-delete').on('click', function(){
             if(confirm("Are you sure you want to permanently delete this media?\n\nWARNING: IF IT IS USED ANYWHERE, IT WILL CREATE 404 RESPONSES")){
-                window.lineStorm.api.call($(this).data('url'), {
+                api.call($(this).data('url'), {
                     type: 'DELETE',
                     success: function(o){
                         alert(o.message);
@@ -80,7 +80,7 @@ define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api', '
         $('.media-form-child-delete').on('click', function(){
             var $mediaChildRow = $(this).closest('tr.media-child-row');
             if(confirm("Are you sure you want to permanently delete this media?\n\nWARNING: IF IT IS USED ANYWHERE, IT WILL CREATE 404 RESPONSES")){
-                window.lineStorm.api.call($(this).data('url'), {
+                api.call($(this).data('url'), {
                     type: 'DELETE',
                     success: function(o){
                         $mediaChildRow.remove();
@@ -92,7 +92,7 @@ define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api', '
         $('.media-children-regenerate').on('click', function(){
             var $mediaChildRow = $(this).closest('tr.media-child-row');
             if(confirm("Are you sure you want to regenerate all resized media?")){
-                window.lineStorm.api.call($(this).data('url'), {
+                api.call($(this).data('url'), {
                     type: 'PATCH',
                     success: function(o){
                         window.location.reload();
