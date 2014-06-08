@@ -2,7 +2,7 @@
 define(['jquery', 'bootstrap', 'cms_api', 'cms_media_treebrowser'], function ($, bs, api, mTree) {
     $(document).ready(function(){
 
-        var $tree = $('.media-tree');
+        var $tree = $('.media-browser');
         mTree.mediaTree($tree);
 
         $('.media-edit').on('click', function(){

@@ -21,7 +21,7 @@ define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api', '
             });
         }
 
-        var $tree = $('.media-tree');
+        var $tree = $('.media-browser');
         mTree.mediaTree($tree);
 
         $('form[name="linestorm_cms_form_media_multiple"]').on('submit', function(e){
@@ -44,7 +44,7 @@ define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api', '
             return false;
         });
 
-        $('form.api-save').on('submit', function(e){
+        $('form.media-api-save').on('submit', function(e){
             e.preventDefault();
             e.stopPropagation();
 

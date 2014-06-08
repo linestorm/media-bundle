@@ -246,15 +246,16 @@ class CategoryController extends AbstractApiController implements ClassResourceI
         $qb = $repo->createQueryBuilder('c')
            ->leftJoin('c.media', 'm')
            ->leftJoin('c.children', 'ch')
-           ->addSelect('m,ch');
+           ->addSelect('m,ch')
+           ->andWhere('m.parent IS NULL');
 
         if(is_numeric($node))
         {
-            $qb->where('c.id = ?1')->setParameter(1, $node);
+            $qb->andWhere('c.id = ?1')->setParameter(1, $node);
         }
         else
         {
-            $qb->where('c.parent IS NULL');
+            $qb->andWhere('c.parent IS NULL');
         }
 
         $categories = $qb->getQuery()->getArrayResult();

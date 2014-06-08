@@ -1,12 +1,18 @@
 define(['jquery', 'jstree'], function ($, jstree) {
 
     return {
-        mediaTree: function($tree, options){
+        mediaTree: function($browser, options){
 
             // load defaults
             options = $.extend(true, {
+                handles: {
+                    tree: '.media-tree',
+                    refresh: '.media-refresh-tree'
+                },
                 multiple: false
             }, options);
+
+            var $tree = $browser.find(options.handles.tree);
 
             var exclude = ($tree.data('exclude') || "").toString().split(',');
 
@@ -80,7 +86,7 @@ define(['jquery', 'jstree'], function ($, jstree) {
                     }
                 },
                 plugins: [
-                    "wholerow", "types"
+                    "wholerow", "types", "checkbox"
                 ]
             });
 
@@ -92,6 +98,13 @@ define(['jquery', 'jstree'], function ($, jstree) {
                 .on('loaded.jstree', function (n, s, e) {
                     $tree.jstree('select_node', $tree.data('init'));
                 });
+
+
+
+            $browser.find(options.handles.refresh).on('click', function(){
+                $tree.jstree('refresh');
+                return false;
+            });
         }
     }
 });

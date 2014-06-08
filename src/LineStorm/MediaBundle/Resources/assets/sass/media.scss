@@ -21,16 +21,27 @@
   }
 }
 
-.media-tree {
-    height: 400px;
-    border: 1px solid #aaaaaa;
-    overflow: auto;
 
-    &.compact {
-        height: 200px;
+.media-browser {
+    position: relative;
+
+    .media-refresh-tree {
+        position: absolute;
+        right: 10px;
+        top: 2px;
+        z-index: 100;
+    }
+
+    .media-tree {
+        height: 400px;
+        border: 1px solid #aaaaaa;
+        overflow: auto;
+
+        &.compact {
+            height: 200px;
+        }
     }
 }
-
 
 .upload-tile {
     position: relative;
