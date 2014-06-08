@@ -12,7 +12,7 @@ define(['jquery', 'bootstrap', 'cms_api', 'cms_media_treebrowser'], function ($,
                 switch(item.type){
                     case "default":
                     case "file":
-                        window.location = item.original.url;
+                        window.location = item.original.node.url;
                         break;
                 }
             }

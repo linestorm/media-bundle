@@ -1,7 +1,8 @@
 define(['jquery', 'jstree'], function ($, jstree) {
 
     return {
-        mediaTree: function($browser, options){
+
+        mediaTree: function ($browser, options) {
 
             // load defaults
             options = $.extend(true, {
@@ -17,36 +18,46 @@ define(['jquery', 'jstree'], function ($, jstree) {
             var exclude = ($tree.data('exclude') || "").toString().split(',');
 
             var processNode = function (o) {
+
                 for (var i in o) {
-                    var n = o[i];
-                    o[i].text = n.name;
-                    o[i].type = "default";
-                    if ('children' in o[i]) {
-                        processNode(o[i].children);
+                    var n = $.extend(true, {}, o[i]);
+                    var d = {
+                        id: 'dir-' + n.id,
+                        text: n.name,
+                        type: 'default',
+                        children: n.children || [],
+                        node: n
+                    };
+
+                    if (d.children.length) {
+                        processNode(d.children);
                     }
 
-                    if ('media' in o[i]) {
-                        for (var j in o[i].media) {
-                            o[i].children = o[i].children || [];
-                            o[i].media[j].text = o[i].media[j].title;
-                            o[i].media[j].type = 'file';
-                            o[i].children.push(o[i].media[j])
+                    if ('media' in n) {
+                        for (var j in n.media) {
+                            d.children = d.children || [];
+                            var node = {
+                                id: 'node-' + n.media[j].id,
+                                text: n.media[j].title,
+                                type: 'file',
+                                url: n.media[j].url,
+                                node: n.media[j]
+                            };
+                            d.children.push(node);
                         }
                     }
 
                     if ("undefined" == typeof o[i].children) {
-                        o[i].children = true;
+                        d.children = true;
                     }
+
+                    o[i] = d;
                 }
             };
 
             var plugins = [
                 "wholerow", "types"
             ];
-
-            if(options.multiple){
-                plugins.push("checkbox")
-            }
 
             $tree.jstree({
                 core: {
@@ -66,13 +77,15 @@ define(['jquery', 'jstree'], function ($, jstree) {
                                     data['to'] = initId;
                                     return data;
                                 }
+                            } else {
+                                data['id'] = node.original.node.id;
                             }
 
-                            data['id'] = node.id;
                             return data;
                         },
                         success: function (o) {
                             processNode(o);
+                            return o;
                         }
                     }
                 },
@@ -99,18 +112,21 @@ define(['jquery', 'jstree'], function ($, jstree) {
             $tree
                 .on('select_node.jstree', function (n, s, e) {
                     // this must be done dynamically!
-                    $($tree.data('input')).val(s.node.id);
+                    $($tree.data('input')).val(s.node.original.node.id);
                 })
                 .on('loaded.jstree', function (n, s, e) {
                     $tree.jstree('select_node', $tree.data('init'));
                 });
 
 
-
-            $browser.find(options.handles.refresh).on('click', function(){
+            $browser.find(options.handles.refresh).on('click', function () {
                 $tree.jstree('refresh');
                 return false;
             });
+
+            return {
+                tree: $tree
+            }
         }
     }
 });
