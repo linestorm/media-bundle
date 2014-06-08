@@ -40,6 +40,14 @@ define(['jquery', 'jstree'], function ($, jstree) {
                 }
             };
 
+            var plugins = [
+                "wholerow", "types"
+            ];
+
+            if(options.multiple){
+                plugins.push("checkbox")
+            }
+
             $tree.jstree({
                 core: {
                     animation: 0,
@@ -85,9 +93,7 @@ define(['jquery', 'jstree'], function ($, jstree) {
                         "valid_children": []
                     }
                 },
-                plugins: [
-                    "wholerow", "types", "checkbox"
-                ]
+                plugins: plugins
             });
 
             $tree
