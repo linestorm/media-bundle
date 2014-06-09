@@ -56,8 +56,10 @@ class ImageResize
      */
     public function saveImage($savePath, $imageQuality = "100", $download = false)
     {
-        if(!is_resource($this->newImage))
+        if(!$this->newImage)
+        {
             return;
+        }
 
         switch($this->ext)
         {
@@ -111,9 +113,6 @@ class ImageResize
      */
     public function resizeTo($width, $height, $resizeOption = ImageResize::RESIZE_DEFAULT)
     {
-        if(!is_resource($this->newImage))
-            return;
-
         switch(strtolower($resizeOption))
         {
             case self::RESIZE_EXACT:

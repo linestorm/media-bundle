@@ -183,7 +183,10 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
         $this->em->flush($media);
 
         // index the media object
-        $this->searchProvider->index($media);
+        if($this->searchProvider)
+        {
+            $this->searchProvider->index($media);
+        }
 
         return $media;
     }
@@ -306,9 +309,11 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
             unlink($file);
         }
 
-
         // index the media object
-        $this->searchProvider->remove($media);
+        if($this->searchProvider)
+        {
+            $this->searchProvider->remove($media);
+        }
 
         $this->em->remove($media);
         $this->em->flush();

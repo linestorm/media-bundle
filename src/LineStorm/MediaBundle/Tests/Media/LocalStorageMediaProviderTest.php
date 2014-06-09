@@ -65,7 +65,7 @@ class LocalStorageMediaProviderTest extends AbstractMediaProviderTest
     protected function getProvider($repository = null)
     {
         $entityClass = '\LineStorm\MediaBundle\Tests\Fixtures\Entity\MediaEntity';
-        $this->em = $this->getMock('\Doctrine\ORM\EntityManager', array('getRepository', 'persist', 'flush'), array(), '', false);
+        $this->em = $this->getMock('\Doctrine\ORM\EntityManager', array('getRepository', 'persist', 'remove', 'flush'), array(), '', false);
         $sc = $this->getMock('\Symfony\Component\Security\Core\SecurityContext', array('getToken'), array(), '', false);
 
         $token = new UsernamePasswordToken($this->user, 'unittest', 'unittest');
@@ -122,21 +122,46 @@ class LocalStorageMediaProviderTest extends AbstractMediaProviderTest
 
     public function testStore()
     {
-        $entityClass = '\LineStorm\MediaBundle\Tests\Fixtures\Entity\MediaEntity';
+        $img = __DIR__.'/../Fixtures/Images/valid.gif';
+        $tmpImg = $this->dir . '/valid.gif';
+        copy($img, $tmpImg);
 
-        $repository = $this->getMock('\Doctrine\ORM\EntityRepository', array('findOneBy'), array(), '', false);
-        $repository->expects($this->once())
-            ->method('findOneBy')
+        $media = new MediaEntity();
+        $media->setPath($tmpImg);
+
+        $entityClass = '\LineStorm\MediaBundle\Tests\Fixtures\Entity\MediaEntity';
+        $provider = $this->getProvider();
+        $this->em->expects($this->once())
+            ->method('persist')
+            ->with($media)
+            ->will($this->returnValue(null));
+        $this->em->expects($this->once())
+            ->method('flush')
             ->will($this->returnValue(null));
 
-        $provider = $this->getProvider($repository);
+
+        $returnedMedia = $provider->store($media);
+
+        $this->assertInstanceOf($entityClass, $returnedMedia);
+
+        $uploader = $returnedMedia->getUploader();
+        $this->assertInstanceOf('\LineStorm\MediaBundle\Tests\Fixtures\User\FakeAdminUser', $uploader);
+
+    }
+
+
+    public function testUpload()
+    {
+        $entityClass = '\LineStorm\MediaBundle\Tests\Fixtures\Entity\MediaEntity';
+        $provider = $this->getProvider();
 
         $img = __DIR__.'/../Fixtures/Images/valid.gif';
-        copy($img, '/tmp/valid.gif');
+        $tmpImg = $this->dir . '/valid.gif';
+        copy($img, $tmpImg);
 
-        $file = new File('/tmp/valid.gif');
+        $file = new File($tmpImg);
 
-        $returnedMedia = $provider->store($file);
+        $returnedMedia = $provider->upload($file);
 
         $this->assertInstanceOf($entityClass, $returnedMedia);
 
@@ -145,55 +170,37 @@ class LocalStorageMediaProviderTest extends AbstractMediaProviderTest
 
         $hash = $returnedMedia->getHash();
         $this->assertEquals($hash, sha1_file($img));
-
-        $uploader = $returnedMedia->getUploader();
-        $this->assertInstanceOf('\LineStorm\MediaBundle\Tests\Fixtures\User\FakeAdminUser', $uploader);
 
         unlink($this->dir.$returnedMedia->getSrc());
     }
 
     public function testDelete()
     {
-        $entityClass = '\LineStorm\MediaBundle\Tests\Fixtures\Entity\MediaEntity';
-
-        $repository = $this->getMock('\Doctrine\ORM\EntityRepository', array('findOneBy'), array(), '', false);
-        $repository->expects($this->once())
-            ->method('findOneBy')
+        $provider = $this->getProvider();
+        $this->em->expects($this->once())
+            ->method('remove')
             ->will($this->returnValue(null));
 
-        $provider = $this->getProvider($repository);
-
         $img = __DIR__.'/../Fixtures/Images/valid.gif';
-        copy($img, '/tmp/valid.gif');
+        $tmpImg = $this->dir . '/valid.gif';
+        copy($img, $tmpImg);
 
-        $file = new File('/tmp/valid.gif');
 
-        $returnedMedia = $provider->store($file);
+        $media = new MediaEntity();
+        $media->setPath($tmpImg);
+        $media->setSrc('/valid.gif');
 
-        $this->assertInstanceOf($entityClass, $returnedMedia);
+        $provider->delete($media);
 
-        $title = $returnedMedia->getTitle();
-        $this->assertEquals($title, 'valid.gif');
-
-        $hash = $returnedMedia->getHash();
-        $this->assertEquals($hash, sha1_file($img));
-
-        $uploader = $returnedMedia->getUploader();
-        $this->assertInstanceOf('\LineStorm\MediaBundle\Tests\Fixtures\User\FakeAdminUser', $uploader);
-
-        unlink($this->dir.$returnedMedia->getSrc());
+        // check the file was removed
+        $this->assertFileNotExists($tmpImg);
     }
 
     public function testResize()
     {
         $entityClass = '\LineStorm\MediaBundle\Tests\Fixtures\Entity\MediaEntity';
 
-        $repository = $this->getMock('\Doctrine\ORM\EntityRepository', array('findOneBy'), array(), '', false);
-        $repository->expects($this->once())
-            ->method('findOneBy')
-            ->will($this->returnValue(null));
-
-        $provider = $this->getProvider($repository);
+        $provider = $this->getProvider();
 
         $resizer = new MediaResizer('20x20', $this->em, 20, 20);
         $provider->addMediaResizer($resizer);
