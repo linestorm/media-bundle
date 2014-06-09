@@ -14,15 +14,26 @@ define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api', '
 
         var formCount = parseInt($form.data('count')) || 0;
 
+        var $tree = $('.media-browser');
+        var tree = mTree.mediaTree($tree);
 
         if($dropzone.length){
-            mDz.dropzone($dropzone, {
+            var dz = mDz.dropzone($dropzone, {
                 max: 0
+            });
+
+            dz.on('success', function(file, response) {
+                if($form.data('category-id')){
+                    $form.find('.media-form-category').val($form.data('category-id'));
+                } else {
+                    var selected = tree.tree.jstree('get_selected',true);
+                    if(selected.length){
+                        $form.find('.media-form-category').val(selected[0].node.original.node.id);
+                    }
+                }
             });
         }
 
-        var $tree = $('.media-browser');
-        mTree.mediaTree($tree);
 
         $('form[name="linestorm_cms_form_media_multiple"]').on('submit', function(e){
             e.preventDefault();

@@ -39,7 +39,8 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         $user = $this->getUser();
         if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
-            throw new AccessDeniedException();
+            $view = View::create(new ApiExceptionResponse('Access Denied', 403));
+            return $this->get('fos_rest.view_handler')->handle($view);
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
@@ -78,7 +79,8 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         $user = $this->getUser();
         if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
-            throw new AccessDeniedException();
+            $view = View::create(new ApiExceptionResponse('Access Denied', 403));
+            return $this->get('fos_rest.view_handler')->handle($view);
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
@@ -115,7 +117,8 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         $user = $this->getUser();
         if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
-            throw new AccessDeniedException();
+            $view = View::create(new ApiExceptionResponse('Access Denied', 403));
+            return $this->get('fos_rest.view_handler')->handle($view);
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
@@ -156,7 +159,8 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         $user = $this->getUser();
         if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
-            throw new AccessDeniedException();
+            $view = View::create(new ApiExceptionResponse('Access Denied', 403));
+            return $this->get('fos_rest.view_handler')->handle($view);
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
@@ -176,7 +180,8 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         $user = $this->getUser();
         if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
-            throw new AccessDeniedException();
+            $view = View::create(new ApiExceptionResponse('Access Denied', 403));
+            return $this->get('fos_rest.view_handler')->handle($view);
         }
 
         $form = $this->createForm('linestorm_cms_form_media_multiple', null, array(
@@ -212,7 +217,8 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         $user = $this->getUser();
         if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
-            throw new AccessDeniedException();
+            $view = View::create(new ApiExceptionResponse('Access Denied', 403));
+            return $this->get('fos_rest.view_handler')->handle($view);
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
@@ -257,7 +263,8 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         $user = $this->getUser();
         if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
-            throw new AccessDeniedException();
+            $view = View::create(new ApiExceptionResponse('Access Denied', 403));
+            return $this->get('fos_rest.view_handler')->handle($view);
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
@@ -300,11 +307,11 @@ class MediaController extends AbstractApiController implements ClassResourceInte
      */
     public function deleteAction($id)
     {
-
         $user = $this->getUser();
         if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
-            throw new AccessDeniedException();
+            $view = View::create(new ApiExceptionResponse('Access Denied', 403));
+            return $this->get('fos_rest.view_handler')->handle($view);
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
@@ -339,7 +346,8 @@ class MediaController extends AbstractApiController implements ClassResourceInte
         $user = $this->getUser();
         if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
-            throw new AccessDeniedException();
+            $view = View::create(new ApiExceptionResponse('Access Denied', 403));
+            return $this->get('fos_rest.view_handler')->handle($view);
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
@@ -394,9 +402,10 @@ class MediaController extends AbstractApiController implements ClassResourceInte
     public function putBatchAction($id)
     {
         $user = $this->getUser();
-        if (!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
         {
-            throw new AccessDeniedException();
+            $view = View::create(new ApiExceptionResponse('Access Denied', 403));
+            return $this->get('fos_rest.view_handler')->handle($view);
         }
 
         $mediaManager = $this->get('linestorm.cms.media_manager');
@@ -426,6 +435,13 @@ class MediaController extends AbstractApiController implements ClassResourceInte
      */
     public function getTreeExpandedAction(Request $request)
     {
+        $user = $this->getUser();
+        if(!($user instanceof UserInterface) || !($user->hasGroup('admin')))
+        {
+            $view = View::create(new ApiExceptionResponse('Access Denied', 403));
+            return $this->get('fos_rest.view_handler')->handle($view);
+        }
+
         $nodes = $request->query->get('nodes', array());
         $categories = $request->query->get('categories', array());
 

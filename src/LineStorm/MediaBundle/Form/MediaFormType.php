@@ -7,11 +7,14 @@ use LineStorm\MediaBundle\Media\MediaManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * Class MediaFormType
  *
  * @package LineStorm\MediaBundle\Form
+ * @author  Andy Thorne <contrabandvr@gmail.com>
  */
 class MediaFormType extends AbstractType
 {
@@ -43,6 +46,10 @@ class MediaFormType extends AbstractType
             ->add('category', 'mediatreebrowser', array(
                 'class'    => $defaultProvider->getCategoryEntityClass(),
                 'property' => 'name',
+                'constraints' => array(
+                    new NotNull(),
+                    new NotBlank(),
+                )
             ))
             ->add('credits')
             ->add('alt')
