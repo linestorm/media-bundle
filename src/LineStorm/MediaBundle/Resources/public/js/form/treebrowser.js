@@ -124,8 +124,54 @@ define(['jquery', 'jstree'], function ($, jstree) {
                 return false;
             });
 
+            var $preview = $browser.find('.media-directory-preview');
+            if ($preview.length) {
+                $tree
+                    .on('select_node.jstree', function (n, s, e) {
+                        var node = s.node;
+                        if (node.type === 'default') {
+                            console.log(node);
+                            $preview.empty();
+                            $tree.jstree('load_node', node, function (a, b, c, d, e) {
+                                for (c in a.children) {
+                                    d = $tree.jstree('get_node', a.children[c]);
+                                    e = '';
+                                    if (d.type == 'file') {
+                                        e += '<div class="upload-tile small" data-node="">' +
+                                            '<label><div class="upload-preview">' +
+                                            '   <input type="checkbox" value="' + d.original.node.id + '" class="media-select" />' +
+                                            '   <img class="upload-image-thumbnail" data-dz-thumbnail src="' + d.original.node.src + '" />' +
+                                            '   <div class="tile-description"><p>' +
+                                            d.original.node.title
+                                        '    </p></div>' +
+                                            '</div></label>' +
+                                        '</div>';
+                                    }
+                                    $preview.append(e);
+                                }
+                            });
+                        }
+                    });
+
+                $preview.on('change', 'input.media-select', function () {
+                    var $tile = $(this).closest('.upload-tile');
+                    $tile.toggleClass('tile-selected');
+                })
+            }
+
             return {
-                tree: $tree
+                tree: $tree,
+                getCheckedValues: function () {
+                    var $nodes = $preview.find('input.media-select:checked');
+                    var selected = [];
+                    $nodes.each(function () {
+                        selected.push(this.value);
+                    });
+                    return selected;
+                },
+                clearChecked: function(){
+                     $preview.find('input.media-select:checked').attr('checked', false).closest('.upload-tile').removeClass('tile-selected');
+                }
             }
         }
     }

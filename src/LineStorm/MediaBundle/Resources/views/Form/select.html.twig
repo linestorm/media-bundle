@@ -1,15 +1,22 @@
 
-{% if init_node is not defined %}
+<div class="media-browser-window">
+    {% if init_node is not defined %}
     {% set init_node = null %}
-{% endif %}
-{% if exclude_nodes is not defined %}
-    {% set exclude_nodes = null %}
-{% endif %}
-{% if input is not defined %}
-    {% set input = '.media-form-category' %}
-{% endif %}
-{{
-    include('LineStormMediaBundle:Form:mediatreebrowser.html.twig', {
-        url: url('linestorm_cms_module_media_api_get_category_mediatree')
-    })
-}}
+    {% endif %}
+    {% if exclude_nodes is not defined %}
+        {% set exclude_nodes = null %}
+    {% endif %}
+    {% if input is not defined %}
+        {% set input = '.media-form-category' %}
+    {% endif %}
+    {{
+        include('LineStormMediaBundle:Form:mediatreebrowser.html.twig', {
+            url: url('linestorm_cms_module_media_api_get_category_mediatree')
+        })
+    }}
+    <div class="media-directory-preview">
+
+    </div>
+
+    <div class="clearfix"></div>
+</div>

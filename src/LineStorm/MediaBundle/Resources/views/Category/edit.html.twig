@@ -24,6 +24,7 @@
 
                 {{
                     include('LineStormMediaBundle:Form:multiple.html.twig', {
+                        flat: true,
                         init_node: parent_node,
                         exclude_nodes: category.id,
                         input: '#linestorm_cms_form_media_category_parent'
