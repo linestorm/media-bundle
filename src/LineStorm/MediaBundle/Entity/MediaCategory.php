@@ -6,12 +6,10 @@ use Doctrine\ORM\Mapping as ORM;
 use LineStorm\MediaBundle\Model\MediaCategory as BaseMediaCategory;
 
 /**
- * Abstract class for media entities
- *
- *
  * Class MediaCategory
  *
  * @package LineStorm\MediaBundle\Entity
+ * @author  Andy Thorne <contrabandvr@gmail.com>
  */
 abstract class MediaCategory extends BaseMediaCategory
 {

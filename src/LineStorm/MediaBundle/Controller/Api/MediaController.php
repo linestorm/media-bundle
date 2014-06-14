@@ -379,7 +379,7 @@ class MediaController extends AbstractApiController implements ClassResourceInte
                 $mediaDocs[] = new MediaDocument($media);
             }
 
-            $view = $this->createResponse($mediaDocs, 200);
+            $view = $this->createResponse(array(), 200);
         }
         else
         {

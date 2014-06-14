@@ -4,10 +4,13 @@ namespace LineStorm\MediaBundle\Media;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
-use LineStorm\MediaBundle\Media\Exception\MediaFileAlreadyExistsException;
 use LineStorm\MediaBundle\Media\Exception\MediaFileDeniedException;
 use LineStorm\MediaBundle\Media\Exception\MediaFileNotFoundException;
+use LineStorm\MediaBundle\Media\Resizer\ImageResize;
+use LineStorm\MediaBundle\Media\Resizer\MediaResizeProfileManager;
 use LineStorm\MediaBundle\Model\Media;
+use LineStorm\MediaBundle\Model\MediaResizeProfile;
+use LineStorm\MediaBundle\Model\MediaVersion;
 use LineStorm\SearchBundle\Search\SearchProviderInterface;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -79,24 +82,33 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     protected $searchProvider;
 
     /**
-     * @param EntityManager   $em         The Entity Manager to use
-     * @param string          $mediaClass The Entity class
-     * @param SecurityContext $secutiryContext
-     * @param string          $path
-     * @param string          $src
+     * @var MediaResizeProfileManager
      */
-    function __construct(EntityManager $em, $mediaClass, SecurityContext $secutiryContext, $path, $src)
+    protected $mediaResizeProfileManager;
+
+    /**
+     * @param EntityManager                     $em         The Entity Manager to use
+     * @param string                            $mediaClass The Entity class
+     * @param SecurityContext                   $secutiryContext
+     * @param Resizer\MediaResizeProfileManager $mediaResizeProfileManager
+     * @param string                            $path
+     * @param string                            $src
+     */
+    function __construct(EntityManager $em, $mediaClass, SecurityContext $secutiryContext, MediaResizeProfileManager $mediaResizeProfileManager, $path, $src)
     {
-        $this->em             = $em;
-        $this->class          = $mediaClass;
-        $this->storePath      = realpath($path) . DIRECTORY_SEPARATOR;
-        $this->storeDirectory = $src;
+        $this->em                        = $em;
+        $this->class                     = $mediaClass;
+        $this->mediaResizeProfileManager = $mediaResizeProfileManager;
+        $this->storePath                 = realpath($path) . DIRECTORY_SEPARATOR;
+        $this->storeDirectory            = $src;
 
         $token = $secutiryContext->getToken();
         if($token)
         {
             $this->user = $token->getUser();
         }
+
+        // setup resize profiles
     }
 
     /**
@@ -128,6 +140,16 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     public function getCategoryEntityClass()
     {
         return $this->class . "Category";
+    }
+
+    /**
+     * Return the version entity class FQNS
+     *
+     * @return string
+     */
+    public function getVersionEntityClass()
+    {
+        return $this->class . "Version";
     }
 
     /**
@@ -331,14 +353,22 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     {
         if(!count($profiles))
         {
-            $profiles = array_keys($this->mediaResizers);
+            $profiles = $this->mediaResizeProfileManager->getProfiles();
         }
+
 
         $resizedImages = array();
         foreach($profiles as $profile)
         {
-            $resizer         = $this->getResizeProfile($profile);
-            $resizedImages[] = $this->resizeImage($media, $resizer);
+            if(is_string($profile))
+            {
+                $profile = $this->mediaResizeProfileManager->getProfile($profile);
+            }
+
+            if($profile instanceof MediaResizeProfile)
+            {
+                $resizedImages[] = $this->resizeImage($media, $profile);
+            }
         }
 
         return $resizedImages;
@@ -348,18 +378,18 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     /**
      * Resize a media object to a set size, returns the persisted media version object
      *
-     * @param Media        $media
-     * @param MediaResizer $resizer
+     * @param Media              $media
+     * @param MediaResizeProfile $resizeProfile
      *
-     * @return Media|null
+     * @return MediaVersion
      */
-    protected function resizeImage(Media $media, MediaResizer $resizer)
+    protected function resizeImage(Media $media, MediaResizeProfile $resizeProfile)
     {
         $imagePath = pathinfo($media->getPath());
 
         $image = new ImageResize($media->getPath());
 
-        $image->resizeTo($resizer->getX(), $resizer->getY());
+        $image->resizeTo($resizeProfile->getWidth(), $resizeProfile->getHeight());
 
         $newWidth  = $image->getResizeWidth();
         $newHeight = $image->getResizeHeight();
@@ -371,31 +401,19 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
 
         if(file_exists($resizedImagePath))
         {
-            $file = new File($resizedImagePath);
+            $class = $this->getVersionEntityClass();
 
-            $class = $this->class;
-            /** @var Media $resizedMedia */
-            $resizedMedia = clone $media;
-            $resizedMedia->setParent($media);
-            $resizedMedia->setTitle("{$media->getTitle()} [{$resizer->getId()} {$newWidth} x {$newHeight}]");
+            /** @var MediaVersion $mediaVersion */
+            $mediaVersion = new $class();
+            $mediaVersion->setMedia($media);
+            $mediaVersion->setResizeProfile($resizeProfile);
+            $mediaVersion->setPath($resizedImagePath);
+            $mediaVersion->setSrc($this->storeDirectory . $filename);
 
-            $resizedMedia->setName($filename);
-            $resizedMedia->setNameOriginal($media->getName());
+            $this->em->persist($mediaVersion);
+            $this->em->flush($mediaVersion);
 
-            $resizedMedia->setAlt($media->getAlt());
-            $resizedMedia->setCredits($media->getCredits());
-            $resizedMedia->setUploader($media->getUploader());
-
-            try
-            {
-                $entity = $this->upload($file, $resizedMedia);
-
-                return $this->store($entity);
-            }
-            catch(MediaFileAlreadyExistsException $e)
-            {
-                return $e->getEntity();
-            }
+            return $mediaVersion;
         }
 
     }

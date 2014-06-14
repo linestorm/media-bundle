@@ -80,11 +80,17 @@ class Media
     protected $children;
 
     /**
+     * @var MediaVersion[]
+     */
+    protected $versions;
+
+    /**
      *
      */
     function __construct()
     {
         $this->children = new ArrayCollection();
+        $this->versions = new ArrayCollection();
     }
 
     /**
@@ -295,6 +301,50 @@ class Media
     public function getParent()
     {
         return $this->parent;
+    }
+
+    /**
+     * @param MediaVersion $mediaVersion
+     */
+    public function addVersion(MediaVersion $mediaVersion)
+    {
+        $this->versions[] = $mediaVersion;
+    }
+
+    /**
+     * @param MediaVersion $mediaVersion
+     */
+    public function removeVersion(MediaVersion $mediaVersion)
+    {
+        $this->versions->removeElement($mediaVersion);
+    }
+
+    /**
+     * @return MediaVersion[]
+     */
+    public function getVersions()
+    {
+        return $this->versions;
+    }
+
+    /**
+     * Get the resized version - if none found, returns current entity
+     *
+     * @param $name
+     *
+     * @return $this|MediaVersion
+     */
+    public function getVersion($name)
+    {
+        foreach($this->versions as $version)
+        {
+            if($version->getResizeProfile()->getName() == $name)
+            {
+                return $version;
+            }
+        }
+
+        return $this;
     }
 
 }

@@ -6,11 +6,10 @@ use Doctrine\ORM\Mapping as ORM;
 use LineStorm\MediaBundle\Model\Media as BaseMedia;
 
 /**
- * Base Media Entity
- *
  * Class Media
  *
  * @package LineStorm\MediaBundle\Entity
+ * @author  Andy Thorne <contrabandvr@gmail.com>
  */
 abstract class Media extends BaseMedia
 {
@@ -46,5 +45,12 @@ abstract class Media extends BaseMedia
      * @ORM\JoinColumn(nullable=false)
      */
     protected $category;
+
+    /**
+     * @var Media
+     *
+     * @ORM\OneToMany(targetEntity="MediaVersion", mappedBy="media")
+     */
+    protected $versions;
 
 } 

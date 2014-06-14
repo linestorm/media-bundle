@@ -4,6 +4,8 @@ parameters:
 
   linestorm.cms.module.media.search_provider.class: LineStorm\MediaBundle\Search\MediaTriGraphSearchProvider
 
+  linestorm.cms.module.media.resize_profile.manager.class: LineStorm\MediaBundle\Media\Resizer\MediaResizeProfileManager
+
 services:
 
   #
@@ -17,6 +19,14 @@ services:
   # MEDIA MANAGER
   linestorm.cms.media_manager:
         class: %linestorm.cms.module.media.manager.class%
+
+  #
+  # MEDIA RESIZE PROFILE MANAGER
+#  linestorm.cms.media.resize_profile_manager:
+#      class: %linestorm.cms.module.media.resize_profile.manager.class%
+#      arguments:
+#        - @doctrine.orm.default_entity_manager
+#        - LineStormMediaBundle:MediaResizeProfile
 
   #
   # MEDIA DEFAULT SEARCH PROVIDER

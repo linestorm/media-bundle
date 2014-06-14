@@ -2,6 +2,7 @@
 
 namespace LineStorm\MediaBundle\Media;
 use LineStorm\MediaBundle\Model\Media;
+use LineStorm\MediaBundle\Model\MediaResizeProfile;
 use LineStorm\SearchBundle\Search\SearchProviderInterface;
 
 /**
@@ -32,7 +33,7 @@ abstract class AbstractMediaProvider
     /**
      * This holds all the resaize names and sizes
      *
-     * @var MediaResizer[]
+     * @var MediaResizeProfile[]
      */
     protected $mediaResizers;
 
@@ -63,11 +64,11 @@ abstract class AbstractMediaProvider
     /**
      * Set the resize config
      *
-     * @param MediaResizer $resizer
+     * @param MediaResizeProfile $resizeProfile
      */
-    public function addMediaResizer(MediaResizer $resizer)
+    public function addMediaResizer(MediaResizeProfile $resizeProfile)
     {
-        $this->mediaResizers[$resizer->getId()] = $resizer;
+        $this->mediaResizers[$resizeProfile->getName()] = $resizeProfile;
     }
 
     /**
@@ -75,7 +76,7 @@ abstract class AbstractMediaProvider
      *
      * @param $profile
      *
-     * @return MediaResizer
+     * @return MediaResizeProfile
      */
     public function getResizeProfile($profile)
     {

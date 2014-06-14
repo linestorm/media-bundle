@@ -1,6 +1,6 @@
 <?php
 
-namespace LineStorm\MediaBundle\Media;
+namespace LineStorm\MediaBundle\Media\Resizer;
 
 use Doctrine\ORM\EntityManager;
 use LineStorm\MediaBundle\Model\Media;

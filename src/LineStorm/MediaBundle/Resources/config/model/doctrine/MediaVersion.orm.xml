@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <mapped-superclass name="LineStorm\MediaBundle\Model\MediaVersion" table="cms_media_version">
+
+    <field name="src" type="string" length="255" column="src" precision="0" scale="0" nullable="false"/>
+    <field name="path" type="string" length="255" column="path" precision="0" scale="0" nullable="false"/>
+
+  </mapped-superclass>
+</doctrine-mapping>

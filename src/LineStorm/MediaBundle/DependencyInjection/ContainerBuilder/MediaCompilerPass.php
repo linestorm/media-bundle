@@ -28,38 +28,11 @@ class MediaCompilerPass implements CompilerPassInterface
             'linestorm.cms.media_provider'
         );
 
-        $resizeConfig = $container->getParameter('linestorm.cms.media.image_resize_config');
-
-        $resizers = array();
-        foreach($resizeConfig as $profile => $config)
-        {
-            @list($x,$y) = $config;
-
-            $serviceId = 'linestorm.cms.media.image_resizer.'.$profile;
-            $definition = new Definition('LineStorm\MediaBundle\Media\MediaResizer', array(
-                $profile,
-                new Reference('doctrine.orm.entity_manager'),
-                $x,
-                $y
-            ));
-
-            $container->setDefinition($serviceId, $definition);
-            $resizers[] = $serviceId;
-        }
-
         foreach ($taggedServices as $id => $attributes) {
             $managerDefinition->addMethodCall(
                 'addMediaProvider',
                 array(new Reference($id))
             );
-
-            foreach($resizers as $rid)
-            {
-                $container->getDefinition($id)->addMethodCall(
-                    'addMediaResizer',
-                    array(new Reference($rid))
-                );
-            }
         }
 
         $managerDefinition->addMethodCall('setDefaultProvider', array($defaultProvider));

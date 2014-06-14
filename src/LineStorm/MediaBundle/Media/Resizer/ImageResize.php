@@ -1,6 +1,6 @@
 <?php
 
-namespace LineStorm\MediaBundle\Media;
+namespace LineStorm\MediaBundle\Media\Resizer;
 
 /**
  * Resize image class will allow you to resize an image
