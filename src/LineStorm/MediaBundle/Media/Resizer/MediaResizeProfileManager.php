@@ -47,7 +47,6 @@ class MediaResizeProfileManager
      */
     public function getProfile($name)
     {
-        var_dump($name);
         if(array_key_exists($name, $this->mediaResizeProfiles))
         {
             return $this->mediaResizeProfiles[$name];

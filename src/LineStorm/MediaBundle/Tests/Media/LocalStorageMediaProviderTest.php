@@ -5,8 +5,10 @@ namespace LineStorm\MediaBundle\Tests\Media;
 use Doctrine\ORM\EntityManager;
 use LineStorm\MediaBundle\Media\LocalStorageMediaProvider;
 use LineStorm\MediaBundle\Media\MediaProviderInterface;
-use LineStorm\MediaBundle\Media\MediaResizer;
+use LineStorm\MediaBundle\Media\Resizer\MediaResizer;
+use LineStorm\MediaBundle\Media\Resizer\MediaResizeProfileManager;
 use LineStorm\MediaBundle\Tests\Fixtures\Entity\MediaEntity;
+use LineStorm\MediaBundle\Tests\Fixtures\Entity\MediaResizeProfileEntity;
 use LineStorm\MediaBundle\Tests\Fixtures\User\FakeAdminUser;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -33,6 +35,11 @@ class LocalStorageMediaProviderTest extends AbstractMediaProviderTest
      * @var EntityManager
      */
     protected $em;
+
+    /**
+     * @var MediaResizeProfileManager
+     */
+    protected $resizeManager;
 
     protected function setUp()
     {
@@ -65,7 +72,7 @@ class LocalStorageMediaProviderTest extends AbstractMediaProviderTest
     protected function getProvider($repository = null)
     {
         $entityClass = '\LineStorm\MediaBundle\Tests\Fixtures\Entity\MediaEntity';
-        $this->em = $this->getMock('\Doctrine\ORM\EntityManager', array('getRepository', 'persist', 'remove', 'flush'), array(), '', false);
+        $this->em = $this->getMock('\Doctrine\ORM\EntityManager', array('getRepository', 'persist', 'remove', 'flush', 'findAll'), array(), '', false);
         $sc = $this->getMock('\Symfony\Component\Security\Core\SecurityContext', array('getToken'), array(), '', false);
 
         $token = new UsernamePasswordToken($this->user, 'unittest', 'unittest');
@@ -80,7 +87,9 @@ class LocalStorageMediaProviderTest extends AbstractMediaProviderTest
                 ->will($this->returnValue($repository));
         }
 
-        return new LocalStorageMediaProvider($this->em, $entityClass, $sc, $this->dir, '/');
+        $this->resizeManager = new MediaResizeProfileManager($this->em, '');
+
+        return new LocalStorageMediaProvider($this->em, $entityClass, $sc, $this->resizeManager, $this->dir, '/');
     }
 
 
@@ -200,10 +209,12 @@ class LocalStorageMediaProviderTest extends AbstractMediaProviderTest
     {
         $entityClass = '\LineStorm\MediaBundle\Tests\Fixtures\Entity\MediaEntity';
 
-        $provider = $this->getProvider();
+        $repository = $this->getMock('\Doctrine\ORM\EntityRepository', array('findAll', 'findBy'), array(), '', false);
+        $repository->expects($this->once())
+                   ->method('findAll')
+                   ->will($this->returnValue(array(new MediaResizeProfileEntity())));
 
-        $resizer = new MediaResizer('20x20', $this->em, 20, 20);
-        $provider->addMediaResizer($resizer);
+        $provider = $this->getProvider($repository);
 
         $entity = new MediaEntity();
 
