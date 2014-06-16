@@ -28,7 +28,7 @@ define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api', '
                 } else {
                     var selected = tree.tree.jstree('get_selected',true);
                     if(selected.length){
-                        $form.find('.media-form-category').val(selected[0].node.original.node.id);
+                        $form.find('.media-form-category').val(selected[0].original.node.id);
                     }
                 }
             });
@@ -40,7 +40,7 @@ define(['jquery', 'jqueryui', 'bootstrap', 'dropzone', 'typeahead', 'cms_api', '
             e.stopPropagation();
 
             var $form = $(this),
-                $mediaItems = $form.find('.upload-tile');
+                $mediaItems = $form.find('.media-tile');
             api.saveForm($form, function(on, status, xhr){
                 $mediaItems.remove();
             }, function(e, status, ex){

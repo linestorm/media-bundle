@@ -32,7 +32,7 @@
                         this.on("success", function(file, response) {
                             var $form = $(file.previewElement);
 
-                            var $container = $form.find('.upload-form-container');
+                            var $container = $form.find('.media-form-container');
                             $container.html($container.html().replace(/__name__/g, formCount));
                             ++formCount;
 
@@ -55,13 +55,13 @@
                 });
 
                 // dropzone doesn't bind the delete buttons if they were present before init (e.g. on edit pages)
-                $dropzone.find('.upload-remove').on('click', function(){
-                    $(this).closest('.upload-tile').remove();
+                $dropzone.find('.media-remove').on('click', function(){
+                    $(this).closest('.media-tile').remove();
                 });
 
                 // set up the sortable content
                 $dropzone.sortable({
-                    items: '> .upload-tile',
+                    items: '> .media-tile',
                     create: function( event, ui ) {
                     },
                     start: function(e, ui){

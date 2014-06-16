@@ -42,7 +42,7 @@
         overflow-y: auto;
         overflow-x: hidden;
 
-        .upload-tile {
+        .media-tile {
 
             label {
                 display: block;
@@ -96,7 +96,7 @@
     }
 }
 
-.upload-tile {
+.media-tile {
     position: relative;
     border: 1px solid #cccccc;
     width: 270px;
@@ -108,17 +108,53 @@
     overflow: hidden;
     @include transition(border 0.5s ease-in-out);
 
+    &.dz-image-preview {
 
-    &:hover .upload-form-container{
+        &:after {
+            content: 'Uploading...';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 270px;
+            height: 181px;
+            z-index: 5;
+            background-color: rgba(255,255,255,0.7);
+            color: #323232;
+            padding: 30% 25%;
+            display: block;
+            text-align: center;
+            font-weight: bold;
+        }
+
+    }
+
+    &.dz-processing {
+        .media-progress {
+            display: block;
+        }
+    }
+
+    &.dz-success {
+
+        .media-progress {
+            display: none;
+        }
+
+        &:after {
+            display: none;
+        }
+    }
+
+    &:hover .media-form-container{
         height: 133px;
     }
-    &:hover .upload-remove{
+    &:hover .media-remove {
         visibility:visible;
         opacity:1;
         @include transition-delay(0);
     }
 
-    .upload-remove {
+    .media-remove {
         position: absolute;
         top: 10px;
         right: 10px;
@@ -134,21 +170,20 @@
         }
     }
 
-    .upload-preview {
+    .media-preview {
         position: relative;
         height: 179px;
         max-height: 179px;
         background-color: #323232;
 
-        .upload-image-thumbnail {
+        .media-image-thumbnail {
             max-width: 100%;
             max-height: 179px;
             display: block;
             margin: auto;
         }
 
-        .upload-progress {
-            display: block;
+        .media-progress {
             position: absolute;
             bottom: 0;
             left: 0;
@@ -160,11 +195,12 @@
                 height: 5px;
                 background-color: #5cb85c;
                 display: block;
+                width: 0px;
             }
         }
     }
 
-    .upload-form-container {
+    .media-form-container {
         @include transition(height 0.3s ease-in-out);
         height: 0;
         background-color: #ffffff;
@@ -194,16 +230,16 @@
     }
 }
 
-.upload-tile.small {
+.media-tile.small {
     width: 170px;
     height: 114px;
 
-    .upload-preview {
+    .media-preview {
         height: 114px;
         max-height: 114px;
     }
 }
-.upload-tile.tile-selected {
+.media-tile.tile-selected {
     border: 5px solid #5cb85c;
     border-radius: 5px !important;
 }

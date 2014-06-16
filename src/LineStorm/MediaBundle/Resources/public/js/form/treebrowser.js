@@ -137,10 +137,10 @@ define(['jquery', 'jstree'], function ($, jstree) {
                                     d = $tree.jstree('get_node', a.children[c]);
                                     e = '';
                                     if (d.type == 'file') {
-                                        e += '<div class="upload-tile small" data-node="">' +
-                                            '<label><div class="upload-preview">' +
+                                        e += '<div class="media-tile small" data-node="">' +
+                                            '<label><div class="media-preview">' +
                                             '   <input type="checkbox" value="' + d.original.node.id + '" class="media-select" />' +
-                                            '   <img class="upload-image-thumbnail" data-dz-thumbnail src="' + d.original.node.src + '" />' +
+                                            '   <img class="media-image-thumbnail" data-dz-thumbnail src="' + d.original.node.src + '" />' +
                                             '   <div class="tile-description"><p>' +
                                             d.original.node.title
                                         '    </p></div>' +
@@ -154,7 +154,7 @@ define(['jquery', 'jstree'], function ($, jstree) {
                     });
 
                 $preview.on('change', 'input.media-select', function () {
-                    var $tile = $(this).closest('.upload-tile');
+                    var $tile = $(this).closest('.media-tile');
                     $tile.toggleClass('tile-selected');
                 })
             }
@@ -170,7 +170,7 @@ define(['jquery', 'jstree'], function ($, jstree) {
                     return selected;
                 },
                 clearChecked: function(){
-                     $preview.find('input.media-select:checked').attr('checked', false).closest('.upload-tile').removeClass('tile-selected');
+                     $preview.find('input.media-select:checked').attr('checked', false).closest('.media-tile').removeClass('tile-selected');
                 }
             }
         }
