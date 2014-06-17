@@ -38,6 +38,7 @@ class MediaTransformer implements DataTransformerInterface
     {
         if($data instanceof Media)
         {
+            return $data;
             if(!$data->getId() && $data->getHash())
             {
                 $defaultProvider = $this->mediaManager->getDefaultProviderInstance();

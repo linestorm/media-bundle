@@ -20,7 +20,8 @@
     }) }}
     <div class="dropzone"
          data-url="{{ path('linestorm_cms_admin_module_media_upload') }}"
-         data-prototype="{{ fn.dzPreview(form.media.vars.prototype)|e('html_attr') }}">
+         data-prototype="{{ fn.dzPreview(form.media.vars.prototype)|e('html_attr') }}"
+         data-count="{{ form.media.children|length }}">
         <!-- dropzone -->
         {% for child in form.media.children %}
             {{ fn.dzPreview(child) }}

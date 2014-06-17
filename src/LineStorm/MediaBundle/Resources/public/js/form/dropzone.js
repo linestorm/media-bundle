@@ -21,7 +21,7 @@
                     maxFiles: null
                 }, options);
 
-                var formCount = 0;
+                var formCount = parseInt($dropzone.data('count'));
                 var dz = new Dropzone($dropzone[0], {
                     url: $dropzone.data('url'),
                     maxFiles: options.maxFiles,

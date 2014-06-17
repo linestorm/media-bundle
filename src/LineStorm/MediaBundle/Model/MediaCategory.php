@@ -121,6 +121,7 @@ class MediaCategory
     public function addMedion(Media $media)
     {
         $this->media[] = $media;
+        $media->setCategory($this);
     }
 
     /**
@@ -129,6 +130,7 @@ class MediaCategory
     public function addMedia(Media $media)
     {
         $this->media[] = $media;
+        $media->setCategory($this);
     }
 
     /**

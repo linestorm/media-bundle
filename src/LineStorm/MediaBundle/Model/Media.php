@@ -70,16 +70,6 @@ class Media
     protected $uploader;
 
     /**
-     * @var Media
-     */
-    protected $parent;
-
-    /**
-     * @var Media[]
-     */
-    protected $children;
-
-    /**
      * @var MediaVersion[]
      */
     protected $versions;
@@ -89,7 +79,6 @@ class Media
      */
     function __construct()
     {
-        $this->children = new ArrayCollection();
         $this->versions = new ArrayCollection();
     }
 
@@ -107,7 +96,7 @@ class Media
     public function setCategory(MediaCategory $category)
     {
         $this->category = $category;
-        $category->addMedia($this);
+        //$category->addMedia($this);
     }
 
     /**
@@ -261,46 +250,6 @@ class Media
     public function getPath()
     {
         return $this->path;
-    }
-
-    /**
-     * @param Media $child
-     */
-    public function addChild(Media $child)
-    {
-        $this->children[] = $child;
-    }
-
-    /**
-     * @param Media $child
-     */
-    public function removeChild(Media $child)
-    {
-        $this->children->removeElement($child);
-    }
-
-    /**
-     * @return Media[]
-     */
-    public function getChildren()
-    {
-        return $this->children;
-    }
-
-    /**
-     * @param Media $parent
-     */
-    public function setParent($parent)
-    {
-        $this->parent = $parent;
-    }
-
-    /**
-     * @return Media
-     */
-    public function getParent()
-    {
-        return $this->parent;
     }
 
     /**

@@ -425,11 +425,6 @@ class CategoryController extends AbstractApiController implements ClassResourceI
 
         $formValues = $payload[$this->formName];
 
-        // clean up the indexes
-        if(array_key_exists('media', $formValues))
-        {
-            $formValues['media'] = array_values($formValues['media']);
-        }
         $form->submit($formValues);
 
         if($form->isValid())
@@ -439,19 +434,27 @@ class CategoryController extends AbstractApiController implements ClassResourceI
             /** @var MediaCategory $updatedCategory */
             $updatedCategory = $form->getData();
 
-            // force update the category
-            $medias = $updatedCategory->getMedia();
-            foreach($medias as $media)
-            {
-                $media->setCategory($category);
-                $provider->store($media);
-                $provider->resize($media);
-            }
-
             if($category === $updatedCategory->getParent())
             {
                 throw new BadRequestHttpException("You cannot make a category a parent of itself");
             }
+
+            // force update the category
+            $medias = $updatedCategory->getMedia();
+            foreach($medias as $media)
+            {
+                $media->setUploader($this->getUser());
+                if(!$media->getId())
+                {
+                    $provider->store($media);
+                    $provider->resize($media);
+                }
+                else
+                {
+                    $provider->update($media);
+                }
+            }
+
             $em->persist($updatedCategory);
             $em->flush();
 

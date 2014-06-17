@@ -315,7 +315,7 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
         $this->searchProvider->index($media);
 
         $this->em->persist($media);
-        $this->em->flush();
+        $this->em->flush($media);
 
         return $media;
     }

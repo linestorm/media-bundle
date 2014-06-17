@@ -24,21 +24,6 @@ abstract class Media extends BaseMedia
     protected $id;
 
     /**
-     * @var Media
-     *
-     * @ORM\OneToMany(targetEntity="Media", mappedBy="parent")
-     */
-    protected $children;
-
-    /**
-     * @var Media
-     *
-     * @ORM\ManyToOne(targetEntity="Media", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
-     */
-    protected $parent;
-
-    /**
      * @var MediaCategory
      *
      * @ORM\ManyToOne(targetEntity="MediaCategory", inversedBy="media", cascade={"persist"})

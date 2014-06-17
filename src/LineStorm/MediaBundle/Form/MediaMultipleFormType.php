@@ -41,6 +41,7 @@ class MediaMultipleFormType extends AbstractType
             ->add('media', 'collection', array(
                 'type' => new MediaFormType($this->mediaManager),
                 'allow_add' => true,
+                'allow_delete' => true,
             ))
         ;
     }
