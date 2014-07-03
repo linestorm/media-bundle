@@ -160,6 +160,7 @@
         right: 10px;
         cursor: pointer;
 
+        z-index: 100;
         visibility:hidden;
         opacity:0;
         @include transition(visibility 0s linear 0.5s);

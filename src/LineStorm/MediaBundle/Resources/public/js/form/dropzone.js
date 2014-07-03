@@ -71,7 +71,6 @@
 
                     }
                 });
-                $dropzone.disableSelection();
 
                 return dz;
             }
