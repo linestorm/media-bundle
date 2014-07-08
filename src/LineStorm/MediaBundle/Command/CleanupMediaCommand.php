@@ -67,19 +67,30 @@ class CleanupMediaCommand extends ContainerAwareCommand
         $files = glob($basePath.'*.{png,gif,jpg,jpeg}', GLOB_BRACE);
 
         $purgable = array_diff($files, $paths);
-
-        $output->writeln("Purging ".count($purgable)." images");
+        $purgeCount = count($purgable);
+        $output->writeln("Found {$purgeCount} images that can be purged");
         if(!$input->getOption('force'))
         {
             $output->writeln('You must use --force to execute the purge');
         }
-        else
+        elseif($purgeCount > 0)
         {
             $output->writeln("Purging images Images");
+
+            $progress = $this->getHelperSet()->get('progress');
+
+            $progress->start($output, $purgeCount);
             foreach($purgable as $pfile)
             {
                 unlink($pfile);
+                $progress->advance();
             }
+
+            $progress->finish();
+        }
+        else
+        {
+            $output->writeln("No images were purged, as none were found to be invalid");
         }
 
     }

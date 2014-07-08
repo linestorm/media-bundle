@@ -6,6 +6,13 @@ use LineStorm\MediaBundle\Media\Optimiser\AbstractOptimiseProfile;
 use LineStorm\MediaBundle\Media\Optimiser\OptimiseProfileInterface;
 use LineStorm\MediaBundle\Model\Media;
 
+/**
+ * Use jpegoptim and optipng to optimise images
+ *
+ * Class ScriptOptimiser
+ *
+ * @package LineStorm\MediaBundle\Media\Optimiser\Optimisers
+ */
 class ScriptOptimiser extends AbstractOptimiseProfile implements OptimiseProfileInterface
 {
 

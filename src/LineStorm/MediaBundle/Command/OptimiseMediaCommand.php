@@ -2,7 +2,6 @@
 
 namespace LineStorm\MediaBundle\Command;
 
-use LineStorm\MediaBundle\Media\Optimiser\Optimisers\GDOptimiser;
 use LineStorm\MediaBundle\Model\Media;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -40,15 +39,27 @@ class OptimiseMediaCommand extends ContainerAwareCommand
 
         /** @var Media[] $mediaEntities */
         $mediaEntities = $mediaManager->findBy(array());
+        $entityCount = count($mediaEntities);
 
-        foreach($mediaEntities as $media)
+        if($entityCount > 0)
         {
-            $output->writeln("Optimising {$media->getTitle()}");
+            $output->writeln("Optimising {$entityCount} images");
 
-            $optimiser->optimise($media);
+            $progress = $this->getHelperSet()->get('progress');
+
+            $progress->start($output, $entityCount);
+            foreach($mediaEntities as $media)
+            {
+                $optimiser->optimise($media);
+                $progress->advance();
+            }
+
+            $progress->finish();
         }
-
-        $output->writeln("Finished");
+        else
+        {
+            $output->writeln("There were no images found to optimise");
+        }
 
     }
 }
