@@ -107,5 +107,36 @@ class MediaVersion
         return $this->src;
     }
 
+    /**
+     * Returns the image height
+     *
+     * @return int
+     */
+    public function getHeight()
+    {
+        if($this->path)
+        {
+            $size = getimagesize($this->path);
+            return $size[1];
+        }
+
+        return 0;
+    }
+
+    /**
+     * Returns the image width
+     *
+     * @return int
+     */
+    public function getWidth()
+    {
+        if($this->path)
+        {
+            $size = getimagesize($this->path);
+            return $size[0];
+        }
+
+        return 0;
+    }
 
 } 

@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use LineStorm\MediaBundle\Media\Exception\MediaFileDeniedException;
 use LineStorm\MediaBundle\Media\Exception\MediaFileNotFoundException;
+use LineStorm\MediaBundle\Media\Optimiser\OptimiseProfileInterface;
 use LineStorm\MediaBundle\Media\Resizer\ImageResize;
 use LineStorm\MediaBundle\Media\Resizer\MediaResizeProfileManager;
 use LineStorm\MediaBundle\Model\Media;
@@ -50,6 +51,11 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
      * @var UserInterface|null
      */
     protected $user;
+
+    /**
+     * @var OptimiseProfileInterface
+     */
+    protected $optimiser;
 
     /**
      * Mime types that are accepted
@@ -107,8 +113,6 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
         {
             $this->user = $token->getUser();
         }
-
-        // setup resize profiles
     }
 
     /**
@@ -151,6 +155,42 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     {
         return $this->class . "Version";
     }
+
+    /**
+     * @return string
+     */
+    public function getStorePath()
+    {
+        return $this->storePath;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStoreDirectory()
+    {
+        return $this->storeDirectory;
+    }
+
+
+
+    /**
+     * @param OptimiseProfileInterface $optimiser
+     */
+    public function setOptimiser(OptimiseProfileInterface $optimiser)
+    {
+        $this->optimiser = $optimiser;
+    }
+
+    /**
+     * @return OptimiseProfileInterface
+     */
+    public function getOptimiser()
+    {
+        return $this->optimiser;
+    }
+
+
 
     /**
      * @inheritdoc
@@ -300,7 +340,11 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
 
             $media->setSrc($this->storeDirectory . $file->getFilename());
             $media->setPath($this->storePath . $file->getFilename());
+
+            $this->optimiser->optimise($media);
             $media->setHash(sha1_file($file->getPathname()));
+
+
         }
 
         return $media;
@@ -386,10 +430,25 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
     protected function resizeImage(Media $media, MediaResizeProfile $resizeProfile)
     {
         $imagePath = pathinfo($media->getPath());
+        $imageSize = getimagesize($media->getPath());
+
+        // clear old versions
+        $repo = $this->em->getRepository($this->getVersionEntityClass());
+        $query = $repo->createQueryBuilder('mv')
+            ->delete()
+            ->where('mv.media = :media')
+            ->andWhere('mv.resizeProfile = :profile')
+            ->setParameters(array(
+                'media' => $media,
+                'profile' => $resizeProfile,
+            ))
+            ->getQuery();
+        $query->execute();
 
         $image = new ImageResize($media->getPath());
 
-        $image->resizeTo($resizeProfile->getWidth(), $resizeProfile->getHeight());
+        $resizeMethod = ($imageSize[0] >= $imageSize[1])? ImageResize::RESIZE_MAX_WIDTH : ImageResize::RESIZE_MAX_HEIGHT ;
+        $image->resizeTo($resizeProfile->getWidth(), $resizeProfile->getHeight(), $resizeMethod);
 
         $newWidth  = $image->getResizeWidth();
         $newHeight = $image->getResizeHeight();
@@ -409,6 +468,8 @@ class LocalStorageMediaProvider extends AbstractMediaProvider implements MediaPr
             $mediaVersion->setResizeProfile($resizeProfile);
             $mediaVersion->setPath($resizedImagePath);
             $mediaVersion->setSrc($this->storeDirectory . $filename);
+
+            $this->optimiser->optimise($mediaVersion);
 
             $this->em->persist($mediaVersion);
             $this->em->flush($mediaVersion);
